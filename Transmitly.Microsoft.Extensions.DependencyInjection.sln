@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34518.117
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Transmitly.Microsoft.Extensions.DependencyInjection", "src\Transmitly.Microsoft.Extensions.DependencyInjection\Transmitly.Microsoft.Extensions.DependencyInjection.csproj", "{DB305914-A255-4CEA-9A8F-6E46EE5DF297}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Transmitly.Microsoft.Extensions.DependencyInjection.Tests", "tests\Transmitly.Microsoft.Extensions.DepenendencyInjection.Tests\Transmitly.Microsoft.Extensions.DependencyInjection.Tests.csproj", "{1E5CB331-71CE-4DD6-92AA-3E645DD5646B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DB305914-A255-4CEA-9A8F-6E46EE5DF297}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB305914-A255-4CEA-9A8F-6E46EE5DF297}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB305914-A255-4CEA-9A8F-6E46EE5DF297}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB305914-A255-4CEA-9A8F-6E46EE5DF297}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E5CB331-71CE-4DD6-92AA-3E645DD5646B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E5CB331-71CE-4DD6-92AA-3E645DD5646B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E5CB331-71CE-4DD6-92AA-3E645DD5646B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E5CB331-71CE-4DD6-92AA-3E645DD5646B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9BA329D9-3902-4DDF-B99B-63A8DEAA9FE7}
+	EndGlobalSection
+EndGlobal
