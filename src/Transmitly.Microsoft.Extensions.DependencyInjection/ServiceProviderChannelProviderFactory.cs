@@ -8,18 +8,11 @@ using Transmitly.ChannelProvider.Configuration;
 
 namespace Transmitly.Microsoft.Extensions.DependencyInjection
 {
-	class ServiceProviderChannelProviderFactory : BaseChannelProviderFactory
+	class ServiceProviderChannelProviderFactory(IEnumerable<IChannelProviderRegistration> channelProviders, IServiceProvider serviceProvider) : BaseChannelProviderFactory(channelProviders)
 	{
-		private readonly IServiceProvider _serviceProvider;
-
-		public ServiceProviderChannelProviderFactory(IEnumerable<IChannelProviderRegistration> channelProviders, IServiceProvider serviceProvider) : base(channelProviders)
-		{
-			_serviceProvider = serviceProvider;
-		}
-
 		public override Task<IChannelProviderClient> ResolveClientAsync(IChannelProviderRegistration channelProvider)
 		{
-			return Task.FromResult((IChannelProviderClient)_serviceProvider.GetRequiredService(channelProvider.ClientType));
+			return Task.FromResult((IChannelProviderClient)serviceProvider.GetRequiredService(channelProvider.ClientType));
 		}
 	}
 }

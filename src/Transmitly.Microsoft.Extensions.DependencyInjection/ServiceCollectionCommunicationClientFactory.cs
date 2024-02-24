@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
+using Transmitly.ChannelProvider;
 using Transmitly.ChannelProvider.Configuration;
 using Transmitly.Pipeline.Configuration;
 using Transmitly.Template.Configuration;
@@ -26,7 +27,9 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
 			{
 				_services.AddSingleton(channelProvider);
 				if (channelProvider.Configuration == null)
-					_services.AddSingleton(channelProvider.ClientType, (s) => ActivatorUtilities.CreateInstance(s, channelProvider.ClientType));
+				{
+					_services.AddSingleton(channelProvider.ClientType);
+				}
 				else
 					throw new NotImplementedException();
 			}

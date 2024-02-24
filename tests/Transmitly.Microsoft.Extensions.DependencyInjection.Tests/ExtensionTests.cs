@@ -34,5 +34,37 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
 			Assert.AreEqual(Id.Channel.Email(), result.Results.FirstOrDefault()?.ChannelId);
 			Assert.AreEqual("test-channel-provider", result.Results.FirstOrDefault()?.ChannelProviderId);
 		}
+
+		[TestMethod]
+		public async Task ShouldResolveCorrectClient()
+		{
+			var services = new ServiceCollection();
+			services.AddTransient<SimpleDependency>();
+
+			services.AddTransmitly(tly =>
+			{
+				tly.ChannelProvider.Add<TestChannelProvider, ISms>("test-channel-provider");
+				tly.ChannelProvider.Add<TestChannelProvider, IEmail>("test-channel-provider");
+				tly.ChannelProvider.Add<TestChannelProvider2, IEmail>("test-channel-provider");
+
+
+				tly.Pipeline.Add("test-pipeline", options =>
+				{
+					options.AddEmail("from@address.com".AsAudienceAddress(), email =>
+					{
+						email.Subject.AddStringTemplate("Test sub");
+					});
+				});
+			});
+
+			var provider = services.BuildServiceProvider();
+			var client = provider.GetService<ICommunicationsClient>();
+			Assert.IsNotNull(client);
+			var result = await client.DispatchAsync("test-pipeline", "test@test.com", new { });
+			Assert.AreEqual(2, result.Results.Count);
+			Assert.AreEqual("IEmail", result.Results.First()?.ResourceId);
+			Assert.AreEqual("Object2", result.Results.Skip(1).First()?.ResourceId);
+
+		}
 	}
 }
