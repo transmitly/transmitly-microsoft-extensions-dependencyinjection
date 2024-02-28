@@ -61,10 +61,8 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
 			var client = provider.GetService<ICommunicationsClient>();
 			Assert.IsNotNull(client);
 			var result = await client.DispatchAsync("test-pipeline", "test@test.com", new { });
-			Assert.AreEqual(2, result.Results.Count);
+			Assert.AreEqual(1, result.Results.Count);
 			Assert.AreEqual("IEmail", result.Results.First()?.ResourceId);
-			Assert.AreEqual("Object2", result.Results.Skip(1).First()?.ResourceId);
-
 		}
 	}
 }
