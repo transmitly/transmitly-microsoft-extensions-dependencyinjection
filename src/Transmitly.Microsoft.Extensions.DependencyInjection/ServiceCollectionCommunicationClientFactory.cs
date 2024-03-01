@@ -6,7 +6,7 @@ using Transmitly.Template.Configuration;
 
 namespace Transmitly.Microsoft.Extensions.DependencyInjection
 {
-	class ServiceCollectionCommunicationClientFactory(IServiceCollection services) : BaseCommunicationClientFactory
+	sealed class ServiceCollectionCommunicationClientFactory(IServiceCollection services) : BaseCommunicationClientFactory
 	{
 		private readonly IServiceCollection _services = Guard.AgainstNull(services);
 
