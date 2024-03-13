@@ -13,7 +13,7 @@
 		<ProductName>Transmit.ly</ProductName>
 		<Company>Code Impressions</Company>
 		<Title>Transmit.ly Dependency Injection extension for Microsoft Dependency Injection</Title>
-		<Description>A dependency injection exteion for the Transmit.ly communications library.</Description>
+		<Description>A dependency injection extension for the Transmit.ly communications library.</Description>
 		<Copyright>Copyright © (c) Code Impressions, LLC</Copyright>
 		<Authors>Code Impressions</Authors>
 		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
