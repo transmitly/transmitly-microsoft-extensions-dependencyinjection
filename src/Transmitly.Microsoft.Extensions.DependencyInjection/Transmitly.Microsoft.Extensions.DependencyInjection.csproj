@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
 	<PropertyGroup>
 		<TargetFrameworks Condition=" '$(OS)' == 'Windows_NT'">net48;net471</TargetFrameworks>
 		<TargetFrameworks>$(TargetFrameworks);netstandard2.0;net6.0</TargetFrameworks>
@@ -11,11 +10,11 @@
 		<PackageId>Transmitly.Microsoft.Extensions.DependencyInjection</PackageId>
 		<Product>Transmitly</Product>
 		<ProductName>Transmit.ly</ProductName>
-		<Company>Code Impressions</Company>
-		<Title>Transmit.ly Dependency Injection extension for Microsoft Dependency Injection</Title>
-		<Description>A dependency injection extension for the Transmit.ly communications library.</Description>
-		<Copyright>Copyright © (c) Code Impressions, LLC</Copyright>
-		<Authors>Code Impressions</Authors>
+		<Company>Code Impressions, LLC</Company>
+		<Title>Transmitly Dependency Injection extension for Microsoft Dependency Injection</Title>
+		<Description>A Microsoft dependency injection extension for the Transmitly library.</Description>
+		<Copyright>Copyright (c) Code Impressions, LLC</Copyright>
+		<Authors>Code Impressions, LLC</Authors>
 		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 		<PackageIcon>icon-dark.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
@@ -24,23 +23,20 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <None Include="..\..\assets\icon-dark.png">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
-	  <None Include="..\..\README.md">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
+		<None Include="..\..\assets\icon-dark.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="..\..\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
 	</ItemGroup>
-
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.32" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.32" />
-		<PackageReference Include="Microsoft.Extensions.Http" Version="3.1.32" />
+		<!--<PackageReference Include="Microsoft.Extensions.Http" Version="3.1.32" />-->
 		<PackageReference Include="Transmitly" Version="0.1.0-*" />
-	</ItemGroup>
-	<ItemGroup>
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
 		<PackageReference Include="PolySharp" Version="1.14.1" PrivateAssets="All" />
 	</ItemGroup>

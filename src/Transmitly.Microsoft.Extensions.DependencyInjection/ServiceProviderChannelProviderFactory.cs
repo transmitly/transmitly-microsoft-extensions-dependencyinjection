@@ -12,7 +12,7 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
 	{
 		public override Task<IChannelProviderClient> ResolveClientAsync(IChannelProviderRegistration channelProvider)
 		{
-			return Task.FromResult((IChannelProviderClient)serviceProvider.GetRequiredService(channelProvider.ClientType));
+			return Task.FromResult((IChannelProviderClient)ActivatorUtilities.CreateInstance(serviceProvider, channelProvider.ClientType, channelProvider.Configuration));
 		}
 	}
 }

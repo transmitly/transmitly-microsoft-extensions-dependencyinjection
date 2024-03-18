@@ -39,7 +39,7 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
 			_services.AddSingleton<IPipelineFactory, DefaultPipelineFactory>();
 			_services.AddSingleton<IChannelProviderFactory, ServiceProviderChannelProviderFactory>();
 			_services.AddSingleton<ICommunicationsClient, DefaultCommunicationsClient>();
-			_services.AddHttpClient();
+			//_services.AddHttpClient();
 			return new EmptyClient();
 		}
 	}
