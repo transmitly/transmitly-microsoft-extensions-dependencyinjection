@@ -44,16 +44,17 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
 			services.AddTransmitly(tly =>
 			{
 				tly.ChannelProvider.Add<TestChannelProvider, ISms>("test-channel-provider");
-				tly.ChannelProvider.Add<TestChannelProvider, IEmail>("test-channel-provider");
 				tly.ChannelProvider.Add<TestChannelProvider2, IEmail>("test-channel-provider");
-
+				tly.ChannelProvider.Add<TestChannelProvider, IEmail>("test-channel-provider");
 
 				tly.Pipeline.Add("test-pipeline", options =>
 				{
 					options.AddEmail("from@address.com".AsAudienceAddress(), email =>
 					{
 						email.Subject.AddStringTemplate("Test sub");
+
 					});
+					options.UseAnyMatchPipelineDeliveryStrategy();
 				});
 			});
 
@@ -61,8 +62,10 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
 			var client = provider.GetService<ICommunicationsClient>();
 			Assert.IsNotNull(client);
 			var result = await client.DispatchAsync("test-pipeline", "test@test.com", new { });
-			Assert.AreEqual(1, result.Results.Count);
-			Assert.AreEqual("IEmail", result.Results.First()?.ResourceId);
+			Assert.AreEqual(2, result.Results.Count);
+			var results = result.Results.ToList();
+			Assert.AreEqual("Object2", results[0]?.ResourceId);
+			Assert.AreEqual("IEmail", results[1]?.ResourceId);
 		}
 	}
 }
