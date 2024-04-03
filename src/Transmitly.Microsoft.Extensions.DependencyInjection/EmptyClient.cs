@@ -2,11 +2,22 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Transmitly.ChannelProvider;
 
 namespace Transmitly.Microsoft.Extensions.DependencyInjection
 {
 	sealed class EmptyClient : ICommunicationsClient
 	{
+		public void DeliverReport(DeliveryReport report)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void DeliverReports(IReadOnlyCollection<DeliveryReport> reports)
+		{
+			throw new NotImplementedException();
+		}
+
 		public Task<IDispatchCommunicationResult> DispatchAsync(string pipelineName, IReadOnlyCollection<IAudience> audiences, IContentModel contentModel, IReadOnlyCollection<string> allowedChannels, string? cultureInfo = null, CancellationToken cancellationToken = default)
 		{
 			throw new NotImplementedException();

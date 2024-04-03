@@ -29,6 +29,13 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
 					_services.AddSingleton(channelProvider.ClientType, provider => ActivatorUtilities.CreateInstance(provider, channelProvider.ClientType, channelProvider.Configuration));
 				}
 			}
+
+			foreach (var channelProviderAdaptorRegistration in context.ChannelProviderDeliveryReportRequestAdaptors)
+			{
+				_services.AddSingleton(channelProviderAdaptorRegistration);
+				_services.AddSingleton(channelProviderAdaptorRegistration.Type);
+			}
+
 			foreach (var templateEngine in context.TemplateEngines)
 			{
 				_services.AddSingleton(templateEngine);
