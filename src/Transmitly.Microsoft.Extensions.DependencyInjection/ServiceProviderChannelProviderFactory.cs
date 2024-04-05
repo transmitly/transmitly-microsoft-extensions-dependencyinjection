@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Transmitly.Channel.Configuration;
+using Transmitly.Delivery;
 using Transmitly.ChannelProvider;
 using Transmitly.ChannelProvider.Configuration;
 

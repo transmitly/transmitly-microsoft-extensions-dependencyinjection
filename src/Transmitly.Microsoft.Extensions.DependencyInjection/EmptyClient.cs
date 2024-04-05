@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Transmitly.ChannelProvider;
+using Transmitly.Delivery;
 
 namespace Transmitly.Microsoft.Extensions.DependencyInjection
 {
