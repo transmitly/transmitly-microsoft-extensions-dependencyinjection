@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Transmitly.Delivery;
+using Transmitly.Verification;
 
 namespace Transmitly.Microsoft.Extensions.DependencyInjection
 {
@@ -49,6 +50,31 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
 		}
 
 		public Task<IDispatchCommunicationResult> DispatchAsync(string pipelineName, IReadOnlyCollection<IAudience> audiences, IContentModel contentModel, string? cultureInfo = null, CancellationToken cancellationToken = default)
+		{
+			throw new NotImplementedException();
+		}
+
+		public Task<IReadOnlyCollection<ISenderVerificationStatusResult>> GetSenderVerificationStatusAsync(string audienceAddress, string? channelProviderId = null, string? channelId = null)
+		{
+			throw new NotImplementedException();
+		}
+
+		public Task<IReadOnlyCollection<ISenderVerificationSupportedResult>> GetSenderVerificationSupportedChannelProvidersAsync()
+		{
+			throw new NotImplementedException();
+		}
+
+		public Task<IReadOnlyCollection<IInitiateSenderVerificationResult>> InitiateSenderVerificationAsync(string audienceAddress, string channelProviderId, string channelId)
+		{
+			throw new NotImplementedException();
+		}
+
+		public Task<bool?> IsSenderVerifiedAsync(string audienceAddress, string? channelProviderId = null, string? channelId = null)
+		{
+			throw new NotImplementedException();
+		}
+
+		public Task<ISenderVerificationValidationResult> ValidateSenderVerificationAsync(string audienceAddress, string channelProviderId, string channelId, string code, string? token = null)
 		{
 			throw new NotImplementedException();
 		}
