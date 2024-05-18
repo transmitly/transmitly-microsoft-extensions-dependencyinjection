@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Transmitly.Delivery;
+using Transmitly.Verification;
 
 namespace Transmitly.Microsoft.Extensions.DependencyInjection
 {
@@ -52,5 +53,6 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
 		{
 			throw new NotImplementedException();
 		}
+
 	}
 }
