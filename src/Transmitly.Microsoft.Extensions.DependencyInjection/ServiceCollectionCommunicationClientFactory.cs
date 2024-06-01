@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
 using Transmitly.ChannelProvider.Configuration;
+using Transmitly.Persona.Configuration;
 using Transmitly.Pipeline.Configuration;
+using Transmitly.PlatformIdentity.Configuration;
 using Transmitly.Template.Configuration;
 using Transmitly.Verification.Configuration;
 
@@ -35,7 +37,7 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
 
 
                 }
-                
+
                 foreach (var verify in channelProvider.ChannelVerificationClientRegistrations)
                 {
                     _services.AddSingleton(verify);
@@ -67,8 +69,14 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
             _services.AddSingleton<IPipelineFactory, DefaultPipelineFactory>();
             _services.AddSingleton<IChannelProviderFactory, ServiceProviderChannelProviderFactory>();
             _services.AddSingleton<ICommunicationsClient, DefaultCommunicationsClient>();
-            _services.AddSingleton(context.ChannelVerificationConfiguration);
-            _services.AddSingleton<IChannelVerificationCommunicationsClient, DefaultChannelVerificationCommunicationsClient>();
+            _services.AddSingleton<IPersonaFactory, DefaultPersonaFactory>();
+            _services.AddSingleton<IPlatformIdentityResolverFactory, DefaultPlatformIdentityResolverRegistrationFactory>();
+
+            if (context.ChannelVerificationConfiguration != null)
+            {
+                _services.AddSingleton(context.ChannelVerificationConfiguration);
+                _services.AddSingleton<IChannelVerificationCommunicationsClient, DefaultChannelVerificationCommunicationsClient>();
+            }
             return new EmptyClient();
         }
     }

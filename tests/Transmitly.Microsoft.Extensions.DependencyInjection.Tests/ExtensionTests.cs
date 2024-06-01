@@ -19,7 +19,7 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
 				tly.ChannelProvider.Add<TestChannelProvider, object>("test-channel-provider");
 				tly.Pipeline.Add("test-pipeline", options =>
 				{
-					options.AddEmail("from@address.com".AsAudienceAddress(), email =>
+					options.AddEmail("from@address.com".AsIdentityAddress(), email =>
 					{
 						email.Subject.AddStringTemplate("Test sub");
 					});
@@ -49,7 +49,7 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
 
 				tly.Pipeline.Add("test-pipeline", options =>
 				{
-					options.AddEmail("from@address.com".AsAudienceAddress(), email =>
+					options.AddEmail("from@address.com".AsIdentityAddress(), email =>
 					{
 						email.Subject.AddStringTemplate("Test sub");
 
