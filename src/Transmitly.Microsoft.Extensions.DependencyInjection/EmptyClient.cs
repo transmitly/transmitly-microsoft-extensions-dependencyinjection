@@ -58,5 +58,10 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
         {
             throw new NotImplementedException();
         }
+
+        public Task<IDispatchCommunicationResult> DispatchAsync(string pipelineName, IReadOnlyCollection<IIdentityReference> identityReferences, ITransactionModel transactionalModel, IReadOnlyCollection<string> allowedCHannels, string? cultureInfo = null, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
