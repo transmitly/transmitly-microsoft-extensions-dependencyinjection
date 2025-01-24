@@ -12,10 +12,19 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Transmitly.ChannelProvider;
+
 namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
 {
-	class SimpleDependency
+	class TestChannelProviderDispatcher2(SimpleDependency foo) : IChannelProviderDispatcher<object>
 	{
-		public Guid Id => Guid.NewGuid();
+		public readonly SimpleDependency _foo = foo ?? throw new ArgumentNullException(nameof(foo));
+
+		public IReadOnlyCollection<string>? RegisteredEvents => throw new NotImplementedException();
+
+		public Task<IReadOnlyCollection<IDispatchResult?>> DispatchAsync(object communication, IDispatchCommunicationContext communicationContext, CancellationToken cancellationToken)
+		{
+			return Task.FromResult<IReadOnlyCollection<IDispatchResult?>>([new DispatchResult(DispatchStatus.Dispatched, "Object2")]);
+		}
 	}
 }

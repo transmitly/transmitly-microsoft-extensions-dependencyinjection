@@ -1,11 +1,24 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿// ﻿﻿Copyright (c) Code Impressions, LLC. All Rights Reserved.
+//  
+//  Licensed under the Apache License, Version 2.0 (the "License")
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//  
+//      http://www.apache.org/licenses/LICENSE-2.0
+//  
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Transmitly.Delivery;
 using Transmitly.ChannelProvider;
 using Transmitly.ChannelProvider.Configuration;
-using Transmitly.Verification;
 
 namespace Transmitly.Microsoft.Extensions.DependencyInjection
 {
@@ -13,25 +26,17 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
         IEnumerable<IChannelProviderRegistration> channelProviders,
         IServiceProvider serviceProvider) : BaseChannelProviderFactory(channelProviders)
     {
-        public override Task<IChannelProviderClient?> ResolveClientAsync(IChannelProviderRegistration channelProvider, IChannelProviderClientRegistration channelProviderClientRegistration)
+        public override Task<IChannelProviderDispatcher?> ResolveDispatcherAsync(IChannelProviderRegistration channelProvider, IChannelProviderDispatcherRegistration channelProviderClientRegistration)
         {
             if (channelProvider.Configuration == null)
-                return Task.FromResult((IChannelProviderClient?)ActivatorUtilities.CreateInstance(serviceProvider, channelProviderClientRegistration.ClientType));
+                return Task.FromResult((IChannelProviderDispatcher?)ActivatorUtilities.CreateInstance(serviceProvider, channelProviderClientRegistration.DispatcherType));
             else
-                return Task.FromResult((IChannelProviderClient?)ActivatorUtilities.CreateInstance(serviceProvider, channelProviderClientRegistration.ClientType, channelProvider.Configuration));
+                return Task.FromResult((IChannelProviderDispatcher?)ActivatorUtilities.CreateInstance(serviceProvider, channelProviderClientRegistration.DispatcherType, channelProvider.Configuration));
         }
 
         public override Task<IChannelProviderDeliveryReportRequestAdaptor> ResolveDeliveryReportRequestAdaptorAsync(IDeliveryReportRequestAdaptorRegistration channelProviderDeliveryReportRequestAdaptor)
         {
             return Task.FromResult((IChannelProviderDeliveryReportRequestAdaptor)ActivatorUtilities.CreateInstance(serviceProvider, channelProviderDeliveryReportRequestAdaptor.Type));
-        }
-
-        public override Task<IChannelVerificationChannelProviderClient> ResolveChannelVerificationClientAsync(IChannelVerificationClientRegistration channelVerificationClientRegistration)
-        {
-            if (channelVerificationClientRegistration.Configuration == null)
-                return Task.FromResult((IChannelVerificationChannelProviderClient)ActivatorUtilities.CreateInstance(serviceProvider, channelVerificationClientRegistration.ClientType));
-            else
-                return Task.FromResult((IChannelVerificationChannelProviderClient)ActivatorUtilities.CreateInstance(serviceProvider, channelVerificationClientRegistration.ClientType, channelVerificationClientRegistration.Configuration));
         }
     }
 }

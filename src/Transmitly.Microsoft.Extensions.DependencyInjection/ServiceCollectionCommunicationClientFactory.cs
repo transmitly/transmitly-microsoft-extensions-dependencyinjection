@@ -1,11 +1,24 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿// ﻿﻿Copyright (c) Code Impressions, LLC. All Rights Reserved.
+//  
+//  Licensed under the Apache License, Version 2.0 (the "License")
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//  
+//      http://www.apache.org/licenses/LICENSE-2.0
+//  
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+
+using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
 using Transmitly.ChannelProvider.Configuration;
 using Transmitly.Persona.Configuration;
 using Transmitly.Pipeline.Configuration;
 using Transmitly.PlatformIdentity.Configuration;
 using Transmitly.Template.Configuration;
-using Transmitly.Verification.Configuration;
 
 namespace Transmitly.Microsoft.Extensions.DependencyInjection
 {
@@ -24,31 +37,18 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
             {
                 _services.AddSingleton(channelProvider);
 
-                foreach (var clientType in channelProvider.ClientRegistrations.Select(s => s.ClientType))
+                foreach (var dispatcherType in channelProvider.DispatcherRegistrations.Select(s => s.DispatcherType))
                 {
                     if (channelProvider.Configuration == null)
                     {
-                        _services.AddSingleton(clientType);
+                        _services.AddSingleton(dispatcherType);
                     }
                     else
                     {
-                        _services.AddSingleton(clientType, provider => ActivatorUtilities.CreateInstance(provider, clientType, channelProvider.Configuration));
+                        _services.AddSingleton(dispatcherType, provider => ActivatorUtilities.CreateInstance(provider, dispatcherType, channelProvider.Configuration));
                     }
 
 
-                }
-
-                foreach (var verify in channelProvider.ChannelVerificationClientRegistrations)
-                {
-                    _services.AddSingleton(verify);
-                    if (verify.Configuration == null)
-                    {
-                        _services.AddSingleton(verify.ClientType);
-                    }
-                    else
-                    {
-                        _services.AddSingleton(verify.ClientType, provider => ActivatorUtilities.CreateInstance(provider, verify.ClientType, verify.Configuration));
-                    }
                 }
 
                 foreach (var channelProviderAdaptorRegistration in channelProvider.DeliveryReportRequestAdaptorRegistrations)
@@ -72,11 +72,6 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
             _services.AddSingleton<IPersonaFactory, DefaultPersonaFactory>();
             _services.AddSingleton<IPlatformIdentityResolverFactory, DefaultPlatformIdentityResolverRegistrationFactory>();
 
-            if (context.ChannelVerificationConfiguration != null)
-            {
-                _services.AddSingleton(context.ChannelVerificationConfiguration);
-                _services.AddSingleton<IChannelVerificationCommunicationsClient, DefaultChannelVerificationCommunicationsClient>();
-            }
             return new EmptyClient();
         }
     }
