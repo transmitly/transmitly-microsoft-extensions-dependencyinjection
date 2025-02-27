@@ -63,6 +63,15 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
                 _services.AddSingleton(templateEngine);
             }
 
+            foreach(var identityResolver in context.PlatformIdentityResolvers)
+            {
+                _services.AddSingleton(identityResolver);
+            }
+
+            foreach(var personas in context.Personas)
+            {
+                _services.AddSingleton(personas);
+            }
 
             _services.AddSingleton(context.DeliveryReportProvider);
             _services.AddSingleton<ITemplateEngineFactory, DefaultTemplateEngineFactory>();
