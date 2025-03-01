@@ -87,7 +87,7 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
         {
             var services = new ServiceCollection();
             services.AddTransient<SimpleDependency>();
-
+            services.AddTransient<TestPlatformIdentityResolver>();
             services.AddTransmitly(tly =>
             {
                 tly.AddPlatformIdentityResolver<TestPlatformIdentityResolver>();

@@ -28,9 +28,9 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
 
         public override ICommunicationsClient CreateClient(ICreateCommunicationsClientContext context)
         {
-            foreach (var pipeline in context.Pipelines)
+            foreach (var pipelineRegistration in context.Pipelines)
             {
-                _services.AddSingleton(pipeline);
+                _services.AddSingleton(pipelineRegistration);
             }
 
             foreach (var channelProvider in context.ChannelProviders)
@@ -47,8 +47,6 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
                     {
                         _services.AddSingleton(dispatcherType, provider => ActivatorUtilities.CreateInstance(provider, dispatcherType, channelProvider.Configuration));
                     }
-
-
                 }
 
                 foreach (var channelProviderAdaptorRegistration in channelProvider.DeliveryReportRequestAdaptorRegistrations)
@@ -58,19 +56,19 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
                 }
             }
 
-            foreach (var templateEngine in context.TemplateEngines)
+            foreach (var templateEngineRegistration in context.TemplateEngines)
             {
-                _services.AddSingleton(templateEngine);
+                _services.AddSingleton(templateEngineRegistration);
             }
 
-            foreach(var identityResolver in context.PlatformIdentityResolvers)
+            foreach (var identityResolverRegistration in context.PlatformIdentityResolvers)
             {
-                _services.AddSingleton(identityResolver);
+                _services.AddSingleton(identityResolverRegistration);
             }
 
-            foreach(var personas in context.Personas)
+            foreach (var personaRegistration in context.Personas)
             {
-                _services.AddSingleton(personas);
+                _services.AddSingleton(personaRegistration);
             }
 
             _services.AddSingleton(context.DeliveryReportProvider);

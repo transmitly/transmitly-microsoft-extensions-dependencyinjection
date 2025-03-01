@@ -28,15 +28,12 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
     {
         public override Task<IChannelProviderDispatcher?> ResolveDispatcherAsync(IChannelProviderRegistration channelProvider, IChannelProviderDispatcherRegistration channelProviderClientRegistration)
         {
-            if (channelProvider.Configuration == null)
-                return Task.FromResult((IChannelProviderDispatcher?)ActivatorUtilities.CreateInstance(serviceProvider, channelProviderClientRegistration.DispatcherType));
-            else
-                return Task.FromResult((IChannelProviderDispatcher?)ActivatorUtilities.CreateInstance(serviceProvider, channelProviderClientRegistration.DispatcherType, channelProvider.Configuration));
+            return Task.FromResult((IChannelProviderDispatcher?)serviceProvider.GetService(channelProviderClientRegistration.DispatcherType));
         }
 
         public override Task<IChannelProviderDeliveryReportRequestAdaptor> ResolveDeliveryReportRequestAdaptorAsync(IDeliveryReportRequestAdaptorRegistration channelProviderDeliveryReportRequestAdaptor)
         {
-            return Task.FromResult((IChannelProviderDeliveryReportRequestAdaptor)ActivatorUtilities.CreateInstance(serviceProvider, channelProviderDeliveryReportRequestAdaptor.Type));
+            return Task.FromResult((IChannelProviderDeliveryReportRequestAdaptor)serviceProvider.GetRequiredService(channelProviderDeliveryReportRequestAdaptor.Type));
         }
     }
 }

@@ -12,7 +12,6 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -25,7 +24,7 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
         public override Task<IPlatformIdentityResolver?> ResolveResolver(IPlatformIdentityResolverRegistration platformIdentityResolverRegistration)
         {
             Guard.AgainstNull(platformIdentityResolverRegistration);
-            return Task.FromResult((IPlatformIdentityResolver?)ActivatorUtilities.CreateInstance(serviceProvider, platformIdentityResolverRegistration.ResolverType));
+            return Task.FromResult((IPlatformIdentityResolver?)serviceProvider.GetService(platformIdentityResolverRegistration.ResolverType));
         }
     }
 }
