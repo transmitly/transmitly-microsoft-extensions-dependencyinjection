@@ -19,12 +19,12 @@ using Transmitly.PlatformIdentity.Configuration;
 
 namespace Transmitly.Microsoft.Extensions.DependencyInjection
 {
-    sealed class ServiceProviderPlatformIdentityResolverRegistrationFactory(IEnumerable<IPlatformIdentityResolverRegistration> resolverRegistrations, IServiceProvider serviceProvider) : BasePlatformIdentityResolverRegistrationFactory(resolverRegistrations)
-    {
-        public override Task<IPlatformIdentityResolver?> ResolveResolver(IPlatformIdentityResolverRegistration platformIdentityResolverRegistration)
-        {
-            Guard.AgainstNull(platformIdentityResolverRegistration);
-            return Task.FromResult((IPlatformIdentityResolver?)serviceProvider.GetService(platformIdentityResolverRegistration.ResolverType));
-        }
-    }
+	sealed class ServiceProviderPlatformIdentityResolverRegistrationFactory(IEnumerable<IPlatformIdentityResolverRegistration> resolverRegistrations, IServiceProvider serviceProvider) : BasePlatformIdentityResolverRegistrationFactory(resolverRegistrations)
+	{
+		public override Task<IPlatformIdentityResolver?> ResolveResolver(IPlatformIdentityResolverRegistration platformIdentityResolverRegistration)
+		{
+			Guard.AgainstNull(platformIdentityResolverRegistration);
+			return Task.FromResult((IPlatformIdentityResolver?)serviceProvider.GetService(platformIdentityResolverRegistration.ResolverType));
+		}
+	}
 }

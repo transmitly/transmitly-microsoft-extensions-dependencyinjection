@@ -22,18 +22,18 @@ using Transmitly.ChannelProvider.Configuration;
 
 namespace Transmitly.Microsoft.Extensions.DependencyInjection
 {
-    sealed class ServiceProviderChannelProviderFactory(
-        IEnumerable<IChannelProviderRegistration> channelProviders,
-        IServiceProvider serviceProvider) : BaseChannelProviderFactory(channelProviders)
-    {
-        public override Task<IChannelProviderDispatcher?> ResolveDispatcherAsync(IChannelProviderRegistration channelProvider, IChannelProviderDispatcherRegistration channelProviderClientRegistration)
-        {
-            return Task.FromResult((IChannelProviderDispatcher?)serviceProvider.GetService(channelProviderClientRegistration.DispatcherType));
-        }
+	sealed class ServiceProviderChannelProviderFactory(
+		IEnumerable<IChannelProviderRegistration> channelProviders,
+		IServiceProvider serviceProvider) : BaseChannelProviderFactory(channelProviders)
+	{
+		public override Task<IChannelProviderDispatcher?> ResolveDispatcherAsync(IChannelProviderRegistration channelProvider, IChannelProviderDispatcherRegistration channelProviderClientRegistration)
+		{
+			return Task.FromResult((IChannelProviderDispatcher?)serviceProvider.GetService(channelProviderClientRegistration.DispatcherType));
+		}
 
-        public override Task<IChannelProviderDeliveryReportRequestAdaptor> ResolveDeliveryReportRequestAdaptorAsync(IDeliveryReportRequestAdaptorRegistration channelProviderDeliveryReportRequestAdaptor)
-        {
-            return Task.FromResult((IChannelProviderDeliveryReportRequestAdaptor)serviceProvider.GetRequiredService(channelProviderDeliveryReportRequestAdaptor.Type));
-        }
-    }
+		public override Task<IChannelProviderDeliveryReportRequestAdaptor> ResolveDeliveryReportRequestAdaptorAsync(IDeliveryReportRequestAdaptorRegistration channelProviderDeliveryReportRequestAdaptor)
+		{
+			return Task.FromResult((IChannelProviderDeliveryReportRequestAdaptor)serviceProvider.GetRequiredService(channelProviderDeliveryReportRequestAdaptor.Type));
+		}
+	}
 }

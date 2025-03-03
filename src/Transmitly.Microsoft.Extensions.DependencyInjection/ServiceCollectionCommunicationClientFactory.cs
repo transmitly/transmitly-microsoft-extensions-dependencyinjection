@@ -22,64 +22,64 @@ using Transmitly.Template.Configuration;
 
 namespace Transmitly.Microsoft.Extensions.DependencyInjection
 {
-    sealed class ServiceCollectionCommunicationClientFactory(IServiceCollection services) : BaseCommunicationClientFactory
-    {
-        private readonly IServiceCollection _services = Guard.AgainstNull(services);
+	sealed class ServiceCollectionCommunicationClientFactory(IServiceCollection services) : BaseCommunicationClientFactory
+	{
+		private readonly IServiceCollection _services = Guard.AgainstNull(services);
 
-        public override ICommunicationsClient CreateClient(ICreateCommunicationsClientContext context)
-        {
-            foreach (var pipelineRegistration in context.Pipelines)
-            {
-                _services.AddSingleton(pipelineRegistration);
-            }
+		public override ICommunicationsClient CreateClient(ICreateCommunicationsClientContext context)
+		{
+			foreach (var pipelineRegistration in context.Pipelines)
+			{
+				_services.AddSingleton(pipelineRegistration);
+			}
 
-            foreach (var channelProvider in context.ChannelProviders)
-            {
-                _services.AddSingleton(channelProvider);
+			foreach (var channelProvider in context.ChannelProviders)
+			{
+				_services.AddSingleton(channelProvider);
 
-                foreach (var dispatcherType in channelProvider.DispatcherRegistrations.Select(s => s.DispatcherType))
-                {
-                    if (channelProvider.Configuration == null)
-                    {
-                        _services.AddSingleton(dispatcherType);
-                    }
-                    else
-                    {
-                        _services.AddSingleton(dispatcherType, provider => ActivatorUtilities.CreateInstance(provider, dispatcherType, channelProvider.Configuration));
-                    }
-                }
+				foreach (var dispatcherType in channelProvider.DispatcherRegistrations.Select(s => s.DispatcherType))
+				{
+					if (channelProvider.Configuration == null)
+					{
+						_services.AddSingleton(dispatcherType);
+					}
+					else
+					{
+						_services.AddSingleton(dispatcherType, provider => ActivatorUtilities.CreateInstance(provider, dispatcherType, channelProvider.Configuration));
+					}
+				}
 
-                foreach (var channelProviderAdaptorRegistration in channelProvider.DeliveryReportRequestAdaptorRegistrations)
-                {
-                    _services.AddSingleton(channelProviderAdaptorRegistration);
-                    _services.AddSingleton(channelProviderAdaptorRegistration.Type);
-                }
-            }
+				foreach (var channelProviderAdaptorRegistration in channelProvider.DeliveryReportRequestAdaptorRegistrations)
+				{
+					_services.AddSingleton(channelProviderAdaptorRegistration);
+					_services.AddSingleton(channelProviderAdaptorRegistration.Type);
+				}
+			}
 
-            foreach (var templateEngineRegistration in context.TemplateEngines)
-            {
-                _services.AddSingleton(templateEngineRegistration);
-            }
+			foreach (var templateEngineRegistration in context.TemplateEngines)
+			{
+				_services.AddSingleton(templateEngineRegistration);
+			}
 
-            foreach (var identityResolverRegistration in context.PlatformIdentityResolvers)
-            {
-                _services.AddSingleton(identityResolverRegistration);
-            }
+			foreach (var identityResolverRegistration in context.PlatformIdentityResolvers)
+			{
+				_services.AddSingleton(identityResolverRegistration);
+			}
 
-            foreach (var personaRegistration in context.Personas)
-            {
-                _services.AddSingleton(personaRegistration);
-            }
+			foreach (var personaRegistration in context.Personas)
+			{
+				_services.AddSingleton(personaRegistration);
+			}
 
-            _services.AddSingleton(context.DeliveryReportProvider);
-            _services.AddSingleton<ITemplateEngineFactory, DefaultTemplateEngineFactory>();
-            _services.AddSingleton<IPipelineFactory, DefaultPipelineFactory>();
-            _services.AddSingleton<IChannelProviderFactory, ServiceProviderChannelProviderFactory>();
-            _services.AddSingleton<ICommunicationsClient, DefaultCommunicationsClient>();
-            _services.AddSingleton<IPersonaFactory, DefaultPersonaFactory>();
-            _services.AddSingleton<IPlatformIdentityResolverFactory, ServiceProviderPlatformIdentityResolverRegistrationFactory>();
+			_services.AddSingleton(context.DeliveryReportProvider);
+			_services.AddSingleton<ITemplateEngineFactory, DefaultTemplateEngineFactory>();
+			_services.AddSingleton<IPipelineFactory, DefaultPipelineFactory>();
+			_services.AddSingleton<IChannelProviderFactory, ServiceProviderChannelProviderFactory>();
+			_services.AddSingleton<ICommunicationsClient, DefaultCommunicationsClient>();
+			_services.AddSingleton<IPersonaFactory, DefaultPersonaFactory>();
+			_services.AddSingleton<IPlatformIdentityResolverFactory, ServiceProviderPlatformIdentityResolverRegistrationFactory>();
 
-            return new EmptyClient();
-        }
-    }
+			return new EmptyClient();
+		}
+	}
 }

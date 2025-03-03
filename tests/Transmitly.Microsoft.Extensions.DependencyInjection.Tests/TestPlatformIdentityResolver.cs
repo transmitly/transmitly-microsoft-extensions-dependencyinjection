@@ -16,11 +16,11 @@ using Transmitly.PlatformIdentity.Configuration;
 
 namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
 {
-    public class TestPlatformIdentityResolver : IPlatformIdentityResolver
-    {
-        Task<IReadOnlyCollection<IPlatformIdentity>?> IPlatformIdentityResolver.Resolve(IReadOnlyCollection<IIdentityReference> identityReferences)
-        {
-            return Task.FromResult<IReadOnlyCollection<IPlatformIdentity>?>(new List<IPlatformIdentity>() { new PlatformIdentityRecord("Test", "UserTest", ["test@test.com".AsIdentityAddress()]) });
-        }
-    }
+	public class TestPlatformIdentityResolver : IPlatformIdentityResolver
+	{
+		Task<IReadOnlyCollection<IPlatformIdentity>?> IPlatformIdentityResolver.Resolve(IReadOnlyCollection<IIdentityReference> identityReferences)
+		{
+			return Task.FromResult<IReadOnlyCollection<IPlatformIdentity>?>(new List<IPlatformIdentity>() { new PlatformIdentityRecord("Test", "UserTest", ["test@test.com".AsIdentityAddress()]) });
+		}
+	}
 }

@@ -14,10 +14,10 @@
 
 namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
 {
-    public class TestIdentityReference : IIdentityReference
-    {
-        public string Id { get; set; }
+	public class TestIdentityReference : IIdentityReference
+	{
+		public string Id { get; set; }
 
-        public string Type { get; set; }
-    }
+		public string Type { get; set; }
+	}
 }

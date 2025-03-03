@@ -16,41 +16,41 @@ using Transmitly.PlatformIdentity.Configuration;
 
 namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
 {
-    [TestClass]
-    public class ServiceProviderPlatformIdentityResolverRegistrationFactoryTests
-    {
-        [TestMethod]
-        public async Task ResolveResolver_ShouldReturnResolverInstance_WhenRegistrationIsValid()
-        {
-            var serviceProviderMock = new Mock<IServiceProvider>();
-            var resolverMock = new Mock<IPlatformIdentityResolver>();
-            var registrationMock = new Mock<IPlatformIdentityResolverRegistration>();
-            registrationMock.Setup(r => r.ResolverType).Returns(resolverMock.Object.GetType());
-            serviceProviderMock.Setup(sp => sp.GetService(resolverMock.Object.GetType())).Returns(resolverMock.Object);
-            serviceProviderMock.Setup(sp => sp.GetService(typeof(Castle.DynamicProxy.IInterceptor[]))).Returns(new Castle.DynamicProxy.IInterceptor[0]);
-            serviceProviderMock.Setup(sp => sp.GetService(typeof(object))).Returns(new object()); 
+	[TestClass]
+	public class ServiceProviderPlatformIdentityResolverRegistrationFactoryTests
+	{
+		[TestMethod]
+		public async Task ResolveResolver_ShouldReturnResolverInstance_WhenRegistrationIsValid()
+		{
+			var serviceProviderMock = new Mock<IServiceProvider>();
+			var resolverMock = new Mock<IPlatformIdentityResolver>();
+			var registrationMock = new Mock<IPlatformIdentityResolverRegistration>();
+			registrationMock.Setup(r => r.ResolverType).Returns(resolverMock.Object.GetType());
+			serviceProviderMock.Setup(sp => sp.GetService(resolverMock.Object.GetType())).Returns(resolverMock.Object);
+			serviceProviderMock.Setup(sp => sp.GetService(typeof(Castle.DynamicProxy.IInterceptor[]))).Returns(new Castle.DynamicProxy.IInterceptor[0]);
+			serviceProviderMock.Setup(sp => sp.GetService(typeof(object))).Returns(new object());
 
-            var factory = new ServiceProviderPlatformIdentityResolverRegistrationFactory(
-                new[] { registrationMock.Object },
-                serviceProviderMock.Object
-            );
+			var factory = new ServiceProviderPlatformIdentityResolverRegistrationFactory(
+				new[] { registrationMock.Object },
+				serviceProviderMock.Object
+			);
 
-            var result = await factory.ResolveResolver(registrationMock.Object);
+			var result = await factory.ResolveResolver(registrationMock.Object);
 
-            Assert.IsNotNull(result);
-            Assert.AreEqual(resolverMock.Object.GetType(), result.GetType());
-        }
+			Assert.IsNotNull(result);
+			Assert.AreEqual(resolverMock.Object.GetType(), result.GetType());
+		}
 
-        [TestMethod]
-        public async Task ResolveResolver_ShouldThrowArgumentNullException_WhenRegistrationIsNull()
-        {
-            var serviceProviderMock = new Mock<IServiceProvider>();
-            var factory = new ServiceProviderPlatformIdentityResolverRegistrationFactory(
-                Array.Empty<IPlatformIdentityResolverRegistration>(),
-                serviceProviderMock.Object
-            );
+		[TestMethod]
+		public async Task ResolveResolver_ShouldThrowArgumentNullException_WhenRegistrationIsNull()
+		{
+			var serviceProviderMock = new Mock<IServiceProvider>();
+			var factory = new ServiceProviderPlatformIdentityResolverRegistrationFactory(
+				Array.Empty<IPlatformIdentityResolverRegistration>(),
+				serviceProviderMock.Object
+			);
 
-            await Assert.ThrowsExceptionAsync<ArgumentNullException>(() => factory.ResolveResolver(null));
-        }
-    }
+			await Assert.ThrowsExceptionAsync<ArgumentNullException>(() => factory.ResolveResolver(null));
+		}
+	}
 }
