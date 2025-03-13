@@ -22,6 +22,9 @@ namespace Microsoft.Extensions.DependencyInjection
 	{
 		public static IServiceCollection AddTransmitly(this IServiceCollection services, Action<CommunicationsClientBuilder> options)
 		{
+			Guard.AgainstNull(options);
+			Guard.AgainstNull(services);
+
 			var builder = new CommunicationsClientBuilder();
 			options(builder);
 			builder.RegisterClientFactory(new ServiceCollectionCommunicationClientFactory(services));
