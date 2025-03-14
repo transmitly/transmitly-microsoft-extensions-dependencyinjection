@@ -77,7 +77,7 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 		}
 
 		[TestMethod]
-		public async Task InjectedClientShouldBeRegisteredAsync()
+		public void InjectedClientShouldBeRegisteredAsync()
 		{
 			var configuratorMock = new Mock<ICommunicationsClientConfigurator>();
 			configuratorMock.Setup(x => x.ConfigureClient(It.IsAny<CommunicationsClientBuilder>())).Verifiable();
@@ -85,7 +85,6 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 			var services = new ServiceCollection();
 			services.AddSingleton(configuratorMock.Object);
 			services.AddTransmitly<ICommunicationsClientConfigurator, InjectedClient>();
-			//services.AddSingleton(configuratorMock.Object);
 
 			var provider = services.BuildServiceProvider();
 			var client = provider.GetService<ICommunicationsClient>();
@@ -98,7 +97,6 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 		[TestMethod]
 		public async Task InjectedClientShouldNotCallConfigureClientMultipleTimes()
 		{
-
 			var configuratorMock = new Mock<ICommunicationsClientConfigurator>();
 			configuratorMock
 			.Setup(x => x.ConfigureClient(It.IsAny<CommunicationsClientBuilder>()))
@@ -125,7 +123,6 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 		[TestMethod]
 		public async Task DefaultClientShouldNotCallConfigureClientMultipleTimes()
 		{
-
 			var configuratorMock = new Mock<ICommunicationsClientConfigurator>();
 			configuratorMock
 			.Setup(x => x.ConfigureClient(It.IsAny<CommunicationsClientBuilder>()))

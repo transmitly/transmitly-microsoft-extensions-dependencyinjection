@@ -27,7 +27,7 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
 			var registrationMock = new Mock<IPlatformIdentityResolverRegistration>();
 			registrationMock.Setup(r => r.ResolverType).Returns(resolverMock.Object.GetType());
 			serviceProviderMock.Setup(sp => sp.GetService(resolverMock.Object.GetType())).Returns(resolverMock.Object);
-			serviceProviderMock.Setup(sp => sp.GetService(typeof(Castle.DynamicProxy.IInterceptor[]))).Returns(new Castle.DynamicProxy.IInterceptor[0]);
+			serviceProviderMock.Setup(sp => sp.GetService(typeof(Castle.DynamicProxy.IInterceptor[]))).Returns(Array.Empty<Castle.DynamicProxy.IInterceptor>());
 			serviceProviderMock.Setup(sp => sp.GetService(typeof(object))).Returns(new object());
 
 			var factory = new ServiceProviderPlatformIdentityResolverRegistrationFactory(
@@ -50,7 +50,7 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
 				serviceProviderMock.Object
 			);
 
-			await Assert.ThrowsExceptionAsync<ArgumentNullException>(() => factory.ResolveResolver(null));
+			await Assert.ThrowsExceptionAsync<ArgumentNullException>(() => factory.ResolveResolver(null!));
 		}
 	}
 }

@@ -16,8 +16,11 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
 {
 	public class TestIdentityReference : IPlatformIdentityReference
 	{
-		public string Id { get; set; }
+		public string? Id { get; set; }
 
-		public string Type { get; set; }
+		public string? Type { get; set; }
+		string IPlatformIdentityReference.Id => Id!;
+
+		string IPlatformIdentityReference.Type => Type!;
 	}
 }
