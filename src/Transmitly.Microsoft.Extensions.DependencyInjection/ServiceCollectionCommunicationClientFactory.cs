@@ -75,9 +75,9 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
 			_services.AddSingleton<ITemplateEngineFactory, DefaultTemplateEngineFactory>();
 			_services.AddSingleton<IPipelineFactory, DefaultPipelineFactory>();
 			_services.AddSingleton<IChannelProviderFactory, ServiceProviderChannelProviderFactory>();
-			_services.AddSingleton<ICommunicationsClient, DefaultCommunicationsClient>();
 			_services.AddSingleton<IPersonaFactory, DefaultPersonaFactory>();
 			_services.AddSingleton<IPlatformIdentityResolverFactory, ServiceProviderPlatformIdentityResolverRegistrationFactory>();
+			_services.AddSingleton<ICommunicationsClient, DefaultCommunicationsClient>();
 
 			return new EmptyClient();
 		}
