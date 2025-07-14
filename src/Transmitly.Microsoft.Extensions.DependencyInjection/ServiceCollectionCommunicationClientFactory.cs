@@ -14,15 +14,19 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
+using Transmitly.Channel.Configuration;
 using Transmitly.ChannelProvider.Configuration;
+using Transmitly.Delivery;
 using Transmitly.Persona.Configuration;
 using Transmitly.Pipeline.Configuration;
 using Transmitly.PlatformIdentity.Configuration;
 using Transmitly.Template.Configuration;
+using Transmitly.Util;
 
 namespace Transmitly.Microsoft.Extensions.DependencyInjection
 {
-	sealed class ServiceCollectionCommunicationClientFactory(IServiceCollection services) : BaseCommunicationClientFactory
+	sealed class ServiceCollectionCommunicationClientFactory(IServiceCollection services)
+		: BaseCommunicationClientFactory
 	{
 		private readonly IServiceCollection _services = Guard.AgainstNull(services);
 
@@ -45,11 +49,14 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
 					}
 					else
 					{
-						_services.AddSingleton(dispatcherType, provider => ActivatorUtilities.CreateInstance(provider, dispatcherType, channelProvider.Configuration));
+						_services.AddSingleton(dispatcherType,
+							provider => ActivatorUtilities.CreateInstance(provider, dispatcherType,
+								channelProvider.Configuration));
 					}
 				}
 
-				foreach (var channelProviderAdaptorRegistration in channelProvider.DeliveryReportRequestAdaptorRegistrations)
+				foreach (var channelProviderAdaptorRegistration in channelProvider
+					         .DeliveryReportRequestAdaptorRegistrations)
 				{
 					_services.AddSingleton(channelProviderAdaptorRegistration);
 					_services.AddSingleton(channelProviderAdaptorRegistration.Type);
@@ -71,12 +78,22 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
 				_services.AddSingleton(personaRegistration);
 			}
 
-			_services.AddSingleton(context.DeliveryReportProvider);
+
+			_services.AddSingleton(context.DeliveryReportObservers);
+
+			_services.AddSingleton<IDeliveryReportService, DefaultDeliveryReportService>();
 			_services.AddSingleton<ITemplateEngineFactory, DefaultTemplateEngineFactory>();
 			_services.AddSingleton<IPipelineFactory, DefaultPipelineFactory>();
 			_services.AddSingleton<IChannelProviderFactory, ServiceProviderChannelProviderFactory>();
+			_services.AddSingleton<IPipelineService, DefaultPipelineService>();
 			_services.AddSingleton<IPersonaFactory, DefaultPersonaFactory>();
-			_services.AddSingleton<IPlatformIdentityResolverFactory, ServiceProviderPlatformIdentityResolverRegistrationFactory>();
+			_services.AddSingleton<IDispatchCoordinatorService, DefaultDispatchCoordinatorService>();
+			_services.AddSingleton<IChannelChannelProviderService, DefaultChannelChannelProviderService>();
+			_services.AddSingleton<IPersonaService, DefaultPersonaService>();
+			_services.AddSingleton<IPlatformIdentityService, DefaultPlatformIdentityService>();
+			_services
+				.AddSingleton<IPlatformIdentityResolverFactory,
+					ServiceProviderPlatformIdentityResolverRegistrationFactory>();
 			_services.AddSingleton<ICommunicationsClient, DefaultCommunicationsClient>();
 
 			return new EmptyClient();

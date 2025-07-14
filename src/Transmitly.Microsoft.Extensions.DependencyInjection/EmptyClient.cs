@@ -20,24 +20,28 @@ using Transmitly.Delivery;
 
 namespace Transmitly.Microsoft.Extensions.DependencyInjection
 {
-	sealed class EmptyClient : ICommunicationsClient
+	internal sealed class EmptyClient : ICommunicationsClient
 	{
-		public void DeliverReport(DeliveryReport report)
+		public Task<IDispatchCommunicationResult> DispatchAsync(string pipelineIntent, IReadOnlyCollection<IPlatformIdentityProfile> platformIdentities, ITransactionModel transactionalModel,
+			IReadOnlyCollection<string> dispatchChannelPreferences, string? pipelineId = null, string? cultureInfo = null,
+			CancellationToken cancellationToken = default)
 		{
 			throw new NotImplementedException();
 		}
 
-		public void DeliverReports(IReadOnlyCollection<DeliveryReport> reports)
+		public Task<IDispatchCommunicationResult> DispatchAsync(string pipelineIntent, IReadOnlyCollection<IPlatformIdentityReference> identityReferences, ITransactionModel transactionalModel,
+			IReadOnlyCollection<string> dispatchChannelPreferences, string? pipelineId = null, string? cultureInfo = null,
+			CancellationToken cancellationToken = default)
 		{
 			throw new NotImplementedException();
 		}
 
-		public Task<IDispatchCommunicationResult> DispatchAsync(string pipelineName, IReadOnlyCollection<IPlatformIdentityProfile> platformIdentities, ITransactionModel transactionalModel, IReadOnlyCollection<string> channelPreferences, string? cultureInfo = null, CancellationToken cancellationToken = default)
+		public Task DispatchAsync(DeliveryReport report)
 		{
 			throw new NotImplementedException();
 		}
 
-		public Task<IDispatchCommunicationResult> DispatchAsync(string pipelineName, IReadOnlyCollection<IPlatformIdentityReference> identityReferences, ITransactionModel transactionalModel, IReadOnlyCollection<string> channelPreferences, string? cultureInfo = null, CancellationToken cancellationToken = default)
+		public Task DispatchAsync(IReadOnlyCollection<DeliveryReport> reports)
 		{
 			throw new NotImplementedException();
 		}

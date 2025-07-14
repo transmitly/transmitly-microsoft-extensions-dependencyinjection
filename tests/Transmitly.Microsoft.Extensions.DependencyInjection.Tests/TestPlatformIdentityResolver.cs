@@ -18,7 +18,7 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
 {
 	public class TestPlatformIdentityResolver : IPlatformIdentityResolver
 	{
-		Task<IReadOnlyCollection<IPlatformIdentityProfile>?> IPlatformIdentityResolver.Resolve(IReadOnlyCollection<IPlatformIdentityReference> identityReferences)
+		Task<IReadOnlyCollection<IPlatformIdentityProfile>?> IPlatformIdentityResolver.ResolveIdentityProfiles(IReadOnlyCollection<IPlatformIdentityReference> identityReferences)
 		{
 			return Task.FromResult<IReadOnlyCollection<IPlatformIdentityProfile>?>(new List<IPlatformIdentityProfile>() { new PlatformIdentityProfile("Test", "UserTest", ["test@test.com".AsIdentityAddress()]) });
 		}
