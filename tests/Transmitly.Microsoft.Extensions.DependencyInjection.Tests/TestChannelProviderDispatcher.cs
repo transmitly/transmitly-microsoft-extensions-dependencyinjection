@@ -16,20 +16,29 @@ using Transmitly.ChannelProvider;
 
 namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
 {
-	class TestChannelProviderDispatcher(SimpleDependency foo) : IChannelProviderDispatcher<object>, IChannelProviderDispatcher<IEmail>
+	class TestChannelProviderDispatcher(SimpleDependency foo)
+		: IChannelProviderDispatcher<object>, IChannelProviderDispatcher<IEmail>
 	{
 		public readonly SimpleDependency _foo = foo ?? throw new ArgumentNullException(nameof(foo));
 
 		public IReadOnlyCollection<string>? RegisteredEvents => throw new NotImplementedException();
 
-		public Task<IReadOnlyCollection<IDispatchResult?>> DispatchAsync(object communication, IDispatchCommunicationContext communicationContext, CancellationToken cancellationToken)
+		public Task<IReadOnlyCollection<IDispatchResult?>> DispatchAsync(object communication,
+			IDispatchCommunicationContext communicationContext, CancellationToken cancellationToken)
 		{
-			return Task.FromResult<IReadOnlyCollection<IDispatchResult?>>([new DispatchResult(DispatchStatus.Dispatched, "Object")]);
+			return Task.FromResult<IReadOnlyCollection<IDispatchResult?>>([
+				new DispatchResult(CommunicationsStatus.Success(nameof(TestChannelProviderDispatcher), "Dispatched"),
+					"Object")
+			]);
 		}
 
-		public Task<IReadOnlyCollection<IDispatchResult?>> DispatchAsync(IEmail communication, IDispatchCommunicationContext communicationContext, CancellationToken cancellationToken)
+		public Task<IReadOnlyCollection<IDispatchResult?>> DispatchAsync(IEmail communication,
+			IDispatchCommunicationContext communicationContext, CancellationToken cancellationToken)
 		{
-			return Task.FromResult<IReadOnlyCollection<IDispatchResult?>>([new DispatchResult(DispatchStatus.Dispatched, "IEmail")]);
+			return Task.FromResult<IReadOnlyCollection<IDispatchResult?>>([
+				new DispatchResult(CommunicationsStatus.Success(nameof(TestChannelProviderDispatcher), "Dispatched"),
+					"IEmail")
+			]);
 		}
 	}
 }

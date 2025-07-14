@@ -32,29 +32,37 @@ namespace Microsoft.Extensions.DependencyInjection
 
 		private ICommunicationsClient Client
 		{
-			get
-			{
-				return _lazy.Value;
-			}
-		}
-		public void DeliverReport(DeliveryReport report)
-		{
-			Client.DeliverReport(report);
+			get { return _lazy.Value; }
 		}
 
-		public void DeliverReports(IReadOnlyCollection<DeliveryReport> reports)
+		public Task<IDispatchCommunicationResult> DispatchAsync(string pipelineIntent,
+			IReadOnlyCollection<IPlatformIdentityProfile> platformIdentities, ITransactionModel transactionalModel,
+			IReadOnlyCollection<string> dispatchChannelPreferences, string? pipelineId = null,
+			string? cultureInfo = null,
+			CancellationToken cancellationToken = default)
 		{
-			Client.DeliverReports(reports);
+			return Client.DispatchAsync(pipelineIntent, platformIdentities, transactionalModel,
+				dispatchChannelPreferences, pipelineId, cultureInfo, cancellationToken);
 		}
 
-		public Task<IDispatchCommunicationResult> DispatchAsync(string pipelineName, IReadOnlyCollection<IPlatformIdentityProfile> platformIdentities, ITransactionModel transactionalModel, IReadOnlyCollection<string> channelPreferences, string? cultureInfo = null, CancellationToken cancellationToken = default)
+		public Task<IDispatchCommunicationResult> DispatchAsync(string pipelineIntent,
+			IReadOnlyCollection<IPlatformIdentityReference> identityReferences, ITransactionModel transactionalModel,
+			IReadOnlyCollection<string> dispatchChannelPreferences, string? pipelineId = null,
+			string? cultureInfo = null,
+			CancellationToken cancellationToken = default)
 		{
-			return Client.DispatchAsync(pipelineName, platformIdentities, transactionalModel, channelPreferences, cultureInfo, cancellationToken);
+			return Client.DispatchAsync(pipelineIntent, identityReferences, transactionalModel,
+				dispatchChannelPreferences, pipelineId, cultureInfo, cancellationToken);
 		}
 
-		public Task<IDispatchCommunicationResult> DispatchAsync(string pipelineName, IReadOnlyCollection<IPlatformIdentityReference> identityReferences, ITransactionModel transactionalModel, IReadOnlyCollection<string> channelPreferences, string? cultureInfo = null, CancellationToken cancellationToken = default)
+		public Task DispatchAsync(DeliveryReport report)
 		{
-			return Client.DispatchAsync(pipelineName, identityReferences, transactionalModel, channelPreferences, cultureInfo, cancellationToken);
+			return Client.DispatchAsync(report);
+		}
+
+		public Task DispatchAsync(IReadOnlyCollection<DeliveryReport> reports)
+		{
+			return Client.DispatchAsync(reports);
 		}
 	}
 }
