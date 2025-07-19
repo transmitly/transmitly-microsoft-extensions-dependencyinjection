@@ -35,7 +35,7 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
 				serviceProviderMock.Object
 			);
 
-			var result = await factory.ResolveResolver(registrationMock.Object);
+			var result = await factory.GetPlatformIdentityResolver(registrationMock.Object);
 
 			Assert.IsNotNull(result);
 			Assert.AreEqual(resolverMock.Object.GetType(), result.GetType());
@@ -50,7 +50,7 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
 				serviceProviderMock.Object
 			);
 
-			await Assert.ThrowsExceptionAsync<ArgumentNullException>(() => factory.ResolveResolver(null!));
+			await Assert.ThrowsExceptionAsync<ArgumentNullException>(() => factory.GetPlatformIdentityResolver(null!));
 		}
 	}
 }

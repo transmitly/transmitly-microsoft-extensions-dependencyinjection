@@ -16,12 +16,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Transmitly.PlatformIdentity.Configuration;
+using Transmitly.Util;
 
 namespace Transmitly.Microsoft.Extensions.DependencyInjection
 {
 	sealed class ServiceProviderPlatformIdentityResolverRegistrationFactory(IEnumerable<IPlatformIdentityResolverRegistration> resolverRegistrations, IServiceProvider serviceProvider) : BasePlatformIdentityResolverRegistrationFactory(resolverRegistrations)
 	{
-		public override Task<IPlatformIdentityResolver?> ResolveResolver(IPlatformIdentityResolverRegistration platformIdentityResolverRegistration)
+		public override Task<IPlatformIdentityResolver?> GetPlatformIdentityResolver(IPlatformIdentityResolverRegistration platformIdentityResolverRegistration)
 		{
 			Guard.AgainstNull(platformIdentityResolverRegistration);
 			return Task.FromResult((IPlatformIdentityResolver?)serviceProvider.GetService(platformIdentityResolverRegistration.ResolverType));

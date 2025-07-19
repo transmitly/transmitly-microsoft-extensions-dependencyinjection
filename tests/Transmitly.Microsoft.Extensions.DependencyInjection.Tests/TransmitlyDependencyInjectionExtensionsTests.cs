@@ -32,7 +32,7 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 			var provider = services.BuildServiceProvider();
 
 			var client = provider.GetRequiredService<ICommunicationsClient>();
-			client.DeliverReports([]);
+			client.DispatchAsync([]);
 
 			Assert.IsTrue(tracker.WasCalled, "ConfigureClient was not called on MockClientConfigurator.");
 		}
@@ -53,7 +53,7 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 			var provider = services.BuildServiceProvider();
 
 			var client = provider.GetRequiredService<ICommunicationsClient>();
-			client.DeliverReports([]);
+			client.DispatchAsync([]);
 			// Assert - Verify ConfigureClient was called exactly once
 			configuratorMock.Verify(c => c.ConfigureClient(It.IsAny<CommunicationsClientBuilder>()), Times.Once);
 		}
@@ -71,7 +71,7 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 
 			// Act - Trigger service resolution
 			var client = provider.GetRequiredService<ICommunicationsClient>();
-			client.DeliverReports([]);
+			client.DispatchAsync([]);
 			// Assert - Ensure ConfigureClient was called
 			Assert.IsTrue(tracker.WasCalled, "ConfigureClient was not called on MockClientConfigurator.");
 		}

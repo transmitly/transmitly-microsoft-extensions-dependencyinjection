@@ -15,10 +15,12 @@
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
 using Transmitly.ChannelProvider.Configuration;
+using Transmitly.Delivery;
 using Transmitly.Persona.Configuration;
 using Transmitly.Pipeline.Configuration;
 using Transmitly.PlatformIdentity.Configuration;
 using Transmitly.Template.Configuration;
+using Transmitly.Util;
 
 namespace Transmitly.Microsoft.Extensions.DependencyInjection
 {
@@ -71,7 +73,9 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
 				_services.AddSingleton(personaRegistration);
 			}
 
-			_services.AddSingleton(context.DeliveryReportProvider);
+			_services.AddSingleton(context.DeliveryReportObservers);
+
+			_services.AddSingleton<IDeliveryReportService, DefaultDeliveryReportService>();
 			_services.AddSingleton<ITemplateEngineFactory, DefaultTemplateEngineFactory>();
 			_services.AddSingleton<IPipelineFactory, DefaultPipelineFactory>();
 			_services.AddSingleton<IChannelProviderFactory, ServiceProviderChannelProviderFactory>();
