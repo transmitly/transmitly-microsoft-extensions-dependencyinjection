@@ -16,6 +16,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using Transmitly;
 using Transmitly.Microsoft.Extensions.DependencyInjection;
+using Transmitly.Util;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
