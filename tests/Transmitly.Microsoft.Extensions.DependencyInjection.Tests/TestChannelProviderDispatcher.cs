@@ -24,12 +24,12 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
 
 		public Task<IReadOnlyCollection<IDispatchResult?>> DispatchAsync(object communication, IDispatchCommunicationContext communicationContext, CancellationToken cancellationToken)
 		{
-			return Task.FromResult<IReadOnlyCollection<IDispatchResult?>>([new DispatchResult(DispatchStatus.Dispatched, "Object")]);
+			return Task.FromResult<IReadOnlyCollection<IDispatchResult?>>([new DispatchResult(CommunicationsStatus.Success(nameof(TestChannelProviderDispatcher), "Dispatched"), "Object")]);
 		}
 
 		public Task<IReadOnlyCollection<IDispatchResult?>> DispatchAsync(IEmail communication, IDispatchCommunicationContext communicationContext, CancellationToken cancellationToken)
 		{
-			return Task.FromResult<IReadOnlyCollection<IDispatchResult?>>([new DispatchResult(DispatchStatus.Dispatched, "IEmail")]);
+			return Task.FromResult<IReadOnlyCollection<IDispatchResult?>>([new DispatchResult(CommunicationsStatus.Success(nameof(TestChannelProviderDispatcher), "Dispatched"), "IEmail")]);
 		}
 	}
 }
