@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-<PropertyGroup>
-			<TargetFrameworks>net8.0;net9.0;net6.0;netstandard2.0</TargetFrameworks>
-		</PropertyGroup>
-		<PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
-			<TargetFrameworks>net48;net472;$(TargetFrameworks)</TargetFrameworks>
-		</PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>net8.0;net9.0;net6.0;netstandard2.0</TargetFrameworks>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
+		<TargetFrameworks>net48;net472;$(TargetFrameworks)</TargetFrameworks>
+	</PropertyGroup>
 	<PropertyGroup>
 		<Nullable>enable</Nullable>
 		<LangVersion>latest</LangVersion>
@@ -45,7 +45,7 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
 		<PackageReference Include="PolySharp" Version="1.15.0" PrivateAssets="All" />
-		<PackageReference Include="Transmitly" Version="0.2.0" />
+		<PackageReference Include="Transmitly" Version="0.2.1" />
 	</ItemGroup>
 	<ItemGroup>
 		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
