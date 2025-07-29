@@ -1,5 +1,6 @@
 name: Build and Test
-
+permissions:
+  contents: read
 on: 
   workflow_dispatch:
   push:
@@ -8,9 +9,11 @@ on:
     paths:
       - "src/Transmitly.Microsoft.Extensions.DependencyInjection/**"
 jobs:
-  build_test_deploy_template_engine:
-    uses: transmitly/transmitly/.github/workflows/build-and-deploy-general-extension.yml@main
+  build_test_deploy_channel_provider:
+    uses: transmitly/transmitly/.github/workflows/build-and-deploy-channel-provider.yml@main
     with: 
-      projectName: Transmitly.Microsoft.Extensions.DependencyInjection
+      channelProviderName: Transmitly.Microsoft.Extensions.DependencyInjection
       runTests: true
     secrets: inherit
+
+      
