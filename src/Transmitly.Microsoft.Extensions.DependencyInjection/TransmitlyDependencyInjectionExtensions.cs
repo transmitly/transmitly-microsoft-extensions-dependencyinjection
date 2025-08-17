@@ -63,7 +63,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
 			var builder = new CommunicationsClientBuilder();
 			options(builder);
-			builder.RegisterClientMiddleware(new ServiceCollectionCommunicationClientFactory(services));
+			builder.AddClientMiddleware(new ServiceCollectionCommunicationClientFactory(services));
 			builder.BuildClient();
 			return services;
 		}

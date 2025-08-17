@@ -148,7 +148,7 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 		}
 
 		[TestMethod]
-		public async Task ShouldRegisterMiddlewareClientAsync()
+		public async Task ShouldAddClientMiddlewareAsync()
 		{
 			var injectedMiddleware = new Mock<ICommunicationClientMiddleware>();
 			var injectedClient = new Mock<ICommunicationsClient>();
@@ -159,7 +159,7 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 
 			services.AddTransmitly(tly =>
 			{
-				tly.RegisterClientMiddleware(injectedMiddleware.Object)
+				tly.AddClientMiddleware(injectedMiddleware.Object)
 					.AddPipeline("testPipeline", pipeline => { });
 			});
 
