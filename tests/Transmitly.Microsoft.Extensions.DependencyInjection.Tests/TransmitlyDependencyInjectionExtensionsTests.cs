@@ -12,6 +12,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Transmitly;
 
@@ -144,6 +145,27 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 			await client.DispatchAsync("testPipeline", new List<IPlatformIdentityProfile>(), TransactionModel.Create(new { }), new List<string>());
 
 			configuratorMock.Verify(x => x.ConfigureClient(It.IsAny<CommunicationsClientBuilder>()), Times.Once);
+		}
+
+		[TestMethod]
+		public async Task ShouldRegisterMiddlewareClientAsync()
+		{
+			var injectedMiddleware = new Mock<ICommunicationClientMiddleware>();
+			var injectedClient = new Mock<ICommunicationsClient>();
+			injectedMiddleware.Setup(x => x.CreateClient(It.IsAny<ICreateCommunicationsClientContext>(), It.IsAny<ICommunicationsClient?>()))
+				.Returns(injectedClient.Object);
+			
+			var services = new ServiceCollection();
+
+			services.AddTransmitly(tly =>
+			{
+				tly.RegisterClientMiddleware(injectedMiddleware.Object)
+					.AddPipeline("testPipeline", pipeline => { });
+			});
+
+			var provider = services.BuildServiceProvider();
+			var client = provider.GetRequiredService<ICommunicationsClient>();
+			Assert.AreSame(injectedClient.Object, client);
 		}
 	}
 }

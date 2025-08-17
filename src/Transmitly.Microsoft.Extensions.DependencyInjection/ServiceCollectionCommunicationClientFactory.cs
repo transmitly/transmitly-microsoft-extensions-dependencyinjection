@@ -24,11 +24,11 @@ using Transmitly.Util;
 
 namespace Transmitly.Microsoft.Extensions.DependencyInjection
 {
-	sealed class ServiceCollectionCommunicationClientFactory(IServiceCollection services) : BaseCommunicationClientFactory
+	sealed class ServiceCollectionCommunicationClientFactory(IServiceCollection services) : BaseCommunicationClientMiddleware
 	{
 		private readonly IServiceCollection _services = Guard.AgainstNull(services);
 
-		public override ICommunicationsClient CreateClient(ICreateCommunicationsClientContext context)
+		public override ICommunicationsClient CreateClient(ICreateCommunicationsClientContext context, ICommunicationsClient? previousClient)
 		{
 			foreach (var pipelineRegistration in context.Pipelines)
 			{
@@ -86,9 +86,10 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
 			_services.AddSingleton<IPersonaService, DefaultPersonaService>();
 			_services.AddSingleton<IPlatformIdentityResolverFactory, ServiceProviderPlatformIdentityResolverRegistrationFactory>();
 			_services.AddSingleton<IPlatformIdentityService, DefaultPlatformIdentityService>();
-			_services.AddSingleton<ICommunicationsClient, DefaultCommunicationsClient>();
+			_services.AddSingleton<DefaultCommunicationsClient>();
+			_services.AddSingleton(sp => previousClient ?? sp.GetRequiredService<DefaultCommunicationsClient>());
 
-			return new EmptyClient();
+			return previousClient ?? new EmptyClient();
 		}
 	}
 }
