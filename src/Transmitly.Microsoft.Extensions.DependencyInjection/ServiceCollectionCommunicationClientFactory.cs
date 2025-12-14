@@ -90,18 +90,20 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
 
 
 			Type? previousClientType = null;
+			//we are first, register the default
 			if (previousClient == null)
 				_services.AddSingleton<DefaultCommunicationsClient>();
 			else
 			{
+				//middleware before us has created a client, register it's type instead
 				previousClientType = previousClient.GetType();
-				_services.AddSingleton(previousClientType, previousClient);
+				_services.AddSingleton(previousClientType);
 				
 			}
 
-			_services.AddSingleton<ICommunicationsClient>(sp => previousClientType != null ? (ICommunicationsClient)sp.GetRequiredService(previousClientType) : sp.GetRequiredService<DefaultCommunicationsClient>());
+			_services.AddSingleton(sp => previousClientType != null ? (ICommunicationsClient)sp.GetRequiredService(previousClientType) : sp.GetRequiredService<DefaultCommunicationsClient>());
 
-			return previousClient ?? new EmptyClient();
+			return previousClient ?? new UseContainerToResolveCommunicationsClient();
 		}
 	}
 }

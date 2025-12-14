@@ -20,7 +20,7 @@ using Transmitly.Delivery;
 
 namespace Transmitly.Microsoft.Extensions.DependencyInjection
 {
-	sealed class EmptyClient : ICommunicationsClient
+	sealed class UseContainerToResolveCommunicationsClient : ICommunicationsClient
 	{
 		public Task<IDispatchCommunicationResult> DispatchAsync(string pipelineIntent, IReadOnlyCollection<IPlatformIdentityProfile> platformIdentities, ITransactionModel transactionalModel, IReadOnlyCollection<string> dispatchChannelPreferences, string? pipelineId = null, string? cultureInfo = null, CancellationToken cancellationToken = default)
 		{

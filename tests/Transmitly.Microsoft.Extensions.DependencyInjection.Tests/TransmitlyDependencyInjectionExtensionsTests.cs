@@ -12,9 +12,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Transmitly;
+using Transmitly.Microsoft.Extensions.DependencyInjection.Tests;
 
 namespace Microsoft.Extensions.DependencyInjection.Tests
 {
@@ -148,24 +148,35 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 		}
 
 		[TestMethod]
-		public async Task ShouldAddClientMiddlewareAsync()
+		public async Task ShouldUseDIForPlatformIdentityResolver()
 		{
-			var injectedMiddleware = new Mock<ICommunicationClientMiddleware>();
-			var injectedClient = new Mock<ICommunicationsClient>();
-			injectedMiddleware.Setup(x => x.CreateClient(It.IsAny<ICreateCommunicationsClientContext>(), It.IsAny<ICommunicationsClient?>()))
-				.Returns(injectedClient.Object);
-			
 			var services = new ServiceCollection();
+			var dependencyInstance = new SimpleDependency();
+			IdentityResolverWithDependency.CapturedDependency = null;
+
+			services.AddSingleton(dependencyInstance);
+			services.AddTransient<IdentityResolverWithDependency>();
 
 			services.AddTransmitly(tly =>
 			{
-				tly.AddClientMiddleware(injectedMiddleware.Object)
-					.AddPipeline("testPipeline", pipeline => { });
+				tly.ChannelProvider.Add<TestChannelProviderDispatcher2>("Test Channel")
+				   .AddPlatformIdentityResolver<IdentityResolverWithDependency>()
+				   .AddPipeline("testPipeline", pipeline =>
+					   pipeline.AddEmail("test@test.com", email =>
+					   {
+						   email.Subject.AddStringTemplate("test-subject");
+						   email.TextBody.AddStringTemplate("test-body");
+					   }));
 			});
 
 			var provider = services.BuildServiceProvider();
 			var client = provider.GetRequiredService<ICommunicationsClient>();
-			Assert.AreSame(injectedClient.Object, client);
+
+			await client.DispatchAsync("testPipeline",
+				new[] { new TestIdentityReference { Id = "test-id", Type = "test-type" } },
+				TransactionModel.Create(new { }), Array.Empty<string>());
+
+			Assert.AreSame(dependencyInstance, IdentityResolverWithDependency.CapturedDependency);
 		}
 	}
 }
