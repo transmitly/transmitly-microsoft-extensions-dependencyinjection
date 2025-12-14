@@ -13,6 +13,7 @@
 //  limitations under the License.
 
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Linq;
 using Transmitly.ChannelProvider.Configuration;
 using Transmitly.Delivery;
@@ -86,8 +87,19 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
 			_services.AddSingleton<IPersonaService, DefaultPersonaService>();
 			_services.AddSingleton<IPlatformIdentityResolverFactory, ServiceProviderPlatformIdentityResolverRegistrationFactory>();
 			_services.AddSingleton<IPlatformIdentityService, DefaultPlatformIdentityService>();
-			_services.AddSingleton<DefaultCommunicationsClient>();
-			_services.AddSingleton(sp => previousClient ?? sp.GetRequiredService<DefaultCommunicationsClient>());
+
+
+			Type? previousClientType = null;
+			if (previousClient == null)
+				_services.AddSingleton<DefaultCommunicationsClient>();
+			else
+			{
+				previousClientType = previousClient.GetType();
+				_services.AddSingleton(previousClientType, previousClient);
+				
+			}
+
+			_services.AddSingleton<ICommunicationsClient>(sp => previousClientType != null ? (ICommunicationsClient)sp.GetRequiredService(previousClientType) : sp.GetRequiredService<DefaultCommunicationsClient>());
 
 			return previousClient ?? new EmptyClient();
 		}
