@@ -1,4 +1,4 @@
-﻿// ﻿﻿Copyright (c) Code Impressions, LLC. All Rights Reserved.
+// ﻿﻿Copyright (c) Code Impressions, LLC. All Rights Reserved.
 //  
 //  Licensed under the Apache License, Version 2.0 (the "License")
 //  you may not use this file except in compliance with the License.
@@ -12,15 +12,24 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Transmitly.PlatformIdentity.Configuration;
+using Transmitly.Microsoft.Extensions.DependencyInjection.Tests;
 using Transmitly;
 
 namespace Microsoft.Extensions.DependencyInjection.Tests
 {
-	class MockClientConfigurator(ConfigureClientTracker tracker) : ICommunicationsClientConfigurator
+	public partial class TransmitlyDependencyInjectionExtensionsTests
 	{
-		public void ConfigureClient(CommunicationsClientBuilder builder)
+		class ProfileEnricherWithDependency(SimpleDependency dependency) : IPlatformIdentityProfileEnricher
 		{
-			tracker.WasCalled = true;
+			public static SimpleDependency? CapturedDependency { get; set; }
+			private readonly SimpleDependency _dependency = dependency;
+
+			public Task EnrichIdentityProfileAsync(IPlatformIdentityProfile identityProfile)
+			{
+				CapturedDependency = _dependency;
+				return Task.CompletedTask;
+			}
 		}
 	}
 }

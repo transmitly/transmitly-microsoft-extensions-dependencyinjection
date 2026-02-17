@@ -19,19 +19,14 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 {
 	public partial class TransmitlyDependencyInjectionExtensionsTests
 	{
-		class InjectedClient : ICommunicationsClient
+		class InjectedClient(ICommunicationsClientConfigurator configurator) : ICommunicationsClient
 		{
-			private readonly Lazy<ICommunicationsClient> _lazy;
-
-			public InjectedClient(ICommunicationsClientConfigurator configurator)
-			{
-				_lazy = new Lazy<ICommunicationsClient>(() =>
+			private readonly Lazy<ICommunicationsClient> _lazy = new(() =>
 				{
 					var cfg = new CommunicationsClientBuilder();
 					configurator.ConfigureClient(cfg);
 					return cfg.BuildClient();
 				});
-			}
 
 			public ICommunicationsClient Client
 			{

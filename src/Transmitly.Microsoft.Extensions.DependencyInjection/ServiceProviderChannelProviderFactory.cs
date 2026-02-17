@@ -26,9 +26,9 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
 		IEnumerable<IChannelProviderRegistration> channelProviders,
 		IServiceProvider serviceProvider) : BaseChannelProviderFactory(channelProviders)
 	{
-		public override Task<IChannelProviderDispatcher?> ResolveDispatcherAsync(IChannelProviderRegistration channelProvider, IChannelProviderDispatcherRegistration channelProviderClientRegistration)
+		public override Task<IChannelProviderDispatcher?> ResolveDispatcherAsync(IChannelProviderRegistration channelProvider, IChannelProviderDispatcherRegistration channelProviderDispatcherRegistration)
 		{
-			return Task.FromResult((IChannelProviderDispatcher?)serviceProvider.GetService(channelProviderClientRegistration.DispatcherType));
+			return Task.FromResult((IChannelProviderDispatcher?)serviceProvider.GetService(channelProviderDispatcherRegistration.DispatcherType));
 		}
 
 		public override Task<IChannelProviderDeliveryReportRequestAdaptor> ResolveDeliveryReportRequestAdaptorAsync(IDeliveryReportRequestAdaptorRegistration channelProviderDeliveryReportRequestAdaptor)

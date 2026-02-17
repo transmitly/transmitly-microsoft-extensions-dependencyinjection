@@ -41,7 +41,7 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
 			var client = provider.GetService<ICommunicationsClient>();
 			Assert.IsNotNull(client);
 			var result = await client.DispatchAsync("test-pipeline", "test@test.com", new { });
-			Assert.AreEqual(1, result.Results.Count);
+			Assert.HasCount(1, result.Results);
 			Assert.AreEqual(Id.Channel.Email(), result.Results.FirstOrDefault()?.ChannelId);
 			Assert.AreEqual("test-channel-provider", result.Results.FirstOrDefault()?.ChannelProviderId);
 		}
@@ -73,7 +73,7 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
 			var client = provider.GetService<ICommunicationsClient>();
 			Assert.IsNotNull(client);
 			var result = await client.DispatchAsync("test-pipeline", "test@test.com", new { });
-			Assert.AreEqual(2, result.Results.Count);
+			Assert.HasCount(2, result.Results);
 			var results = result.Results.ToList();
 			Assert.AreEqual("Object2", results[0]?.ResourceId);
 			Assert.AreEqual("IEmail", results[1]?.ResourceId);
@@ -101,8 +101,8 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
 			var provider = services.BuildServiceProvider();
 			var client = provider.GetService<ICommunicationsClient>();
 			Assert.IsNotNull(client);
-			var result = await client.DispatchAsync("test-pipeline", new List<TestIdentityReference> { new TestIdentityReference { Id = "Test", Type = "" } }, TransactionModel.Create(new { }));
-			Assert.AreEqual(1, result.Results.Count);
+			var result = await client.DispatchAsync("test-pipeline", new List<TestIdentityReference> { new() { Id = "Test", Type = "" } }, TransactionModel.Create(new { }));
+			Assert.HasCount(1, result.Results);
 			Assert.AreEqual(Id.Channel.Email(), result.Results.FirstOrDefault()?.ChannelId);
 			Assert.AreEqual("test-channel-provider", result.Results.FirstOrDefault()?.ChannelProviderId);
 		}

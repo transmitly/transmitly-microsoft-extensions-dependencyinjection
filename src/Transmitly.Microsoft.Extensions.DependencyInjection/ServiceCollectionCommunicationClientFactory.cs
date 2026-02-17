@@ -29,7 +29,7 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
 	{
 		private readonly IServiceCollection _services = Guard.AgainstNull(services);
 
-		public override ICommunicationsClient CreateClient(ICreateCommunicationsClientContext context, ICommunicationsClient? previousClient)
+		public override ICommunicationsClient CreateClient(ICreateCommunicationsClientContext context, ICommunicationsClient? previous)
 		{
 			foreach (var pipelineRegistration in context.Pipelines)
 			{
@@ -69,6 +69,11 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
 				_services.AddSingleton(identityResolverRegistration);
 			}
 
+			foreach (var identityProfileEnricherRegistration in context.PlatformIdentityProfileEnrichers)
+			{
+				_services.AddSingleton(identityProfileEnricherRegistration);
+			}
+
 			foreach (var personaRegistration in context.Personas)
 			{
 				_services.AddSingleton(personaRegistration);
@@ -87,23 +92,25 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
 			_services.AddSingleton<IPersonaService, DefaultPersonaService>();
 			_services.AddSingleton<IPlatformIdentityResolverFactory, ServiceProviderPlatformIdentityResolverRegistrationFactory>();
 			_services.AddSingleton<IPlatformIdentityService, DefaultPlatformIdentityService>();
+			_services.AddSingleton<IPlatformIdentityProfileEnricherFactory, ServiceProviderPlatformIdentityProfileEnricherRegistrationFactory>();
+			_services.AddSingleton<IPlatformIdentityProfileEnricherService, DefaultPlatformIdentityProfileEnricherService>();
 
 
 			Type? previousClientType = null;
 			//we are first, register the default
-			if (previousClient == null)
+			if (previous == null)
 				_services.AddSingleton<DefaultCommunicationsClient>();
 			else
 			{
 				//middleware before us has created a client, register it's type instead
-				previousClientType = previousClient.GetType();
+				previousClientType = previous.GetType();
 				_services.AddSingleton(previousClientType);
 				
 			}
 
 			_services.AddSingleton(sp => previousClientType != null ? (ICommunicationsClient)sp.GetRequiredService(previousClientType) : sp.GetRequiredService<DefaultCommunicationsClient>());
 
-			return previousClient ?? new UseContainerToResolveCommunicationsClient();
+			return previous ?? new UseContainerToResolveCommunicationsClient();
 		}
 	}
 }

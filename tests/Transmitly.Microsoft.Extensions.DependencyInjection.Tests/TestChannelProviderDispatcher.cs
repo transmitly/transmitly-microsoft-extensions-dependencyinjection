@@ -20,7 +20,7 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
 	{
 		public readonly SimpleDependency _foo = foo ?? throw new ArgumentNullException(nameof(foo));
 
-		public IReadOnlyCollection<string>? RegisteredEvents => throw new NotImplementedException();
+		public static IReadOnlyCollection<string>? RegisteredEvents => throw new NotImplementedException();
 
 		public Task<IReadOnlyCollection<IDispatchResult?>> DispatchAsync(object communication, IDispatchCommunicationContext communicationContext, CancellationToken cancellationToken)
 		{
