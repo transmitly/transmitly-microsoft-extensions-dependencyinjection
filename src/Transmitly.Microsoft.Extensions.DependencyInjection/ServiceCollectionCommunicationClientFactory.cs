@@ -17,6 +17,7 @@ using System;
 using System.Linq;
 using Transmitly.ChannelProvider.Configuration;
 using Transmitly.Delivery;
+using Transmitly.Model.Configuration;
 using Transmitly.Persona.Configuration;
 using Transmitly.Pipeline.Configuration;
 using Transmitly.PlatformIdentity.Configuration;
@@ -69,6 +70,11 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
 				_services.AddSingleton(identityResolverRegistration);
 			}
 
+			foreach (var contentModelEnricherRegistration in context.ContentModelEnrichers)
+			{
+				_services.AddSingleton(contentModelEnricherRegistration);
+			}
+
 			foreach (var identityProfileEnricherRegistration in context.PlatformIdentityProfileEnrichers)
 			{
 				_services.AddSingleton(identityProfileEnricherRegistration);
@@ -92,6 +98,8 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
 			_services.AddSingleton<IPersonaService, DefaultPersonaService>();
 			_services.AddSingleton<IPlatformIdentityResolverFactory, ServiceProviderPlatformIdentityResolverRegistrationFactory>();
 			_services.AddSingleton<IPlatformIdentityService, DefaultPlatformIdentityService>();
+			_services.AddSingleton<IContentModelEnricherFactory, ServiceProviderContentModelEnricherRegistrationFactory>();
+			_services.AddSingleton<IContentModelEnricherService, DefaultContentModelEnricherService>();
 			_services.AddSingleton<IPlatformIdentityProfileEnricherFactory, ServiceProviderPlatformIdentityProfileEnricherRegistrationFactory>();
 			_services.AddSingleton<IPlatformIdentityProfileEnricherService, DefaultPlatformIdentityProfileEnricherService>();
 

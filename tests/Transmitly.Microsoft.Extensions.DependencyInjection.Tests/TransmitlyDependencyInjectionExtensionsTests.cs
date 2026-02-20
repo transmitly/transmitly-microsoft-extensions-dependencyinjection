@@ -14,6 +14,7 @@
 
 using Moq;
 using Transmitly;
+using Transmitly.Exceptions;
 using Transmitly.Microsoft.Extensions.DependencyInjection.Tests;
 
 namespace Microsoft.Extensions.DependencyInjection.Tests
@@ -214,6 +215,34 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 		}
 
 		[TestMethod]
+		public async Task ShouldUseDIForContentModelEnricher()
+		{
+			var services = new ServiceCollection();
+			var dependencyInstance = new SimpleDependency();
+			ContentModelEnricherWithDependency.CapturedDependency = null;
+
+			services.AddSingleton(dependencyInstance);
+			services.AddTransient<ContentModelEnricherWithDependency>();
+
+			services.AddTransmitly(tly =>
+			{
+				ConfigureBasicPipeline(tly);
+				tly.AddContentModelEnricher<ContentModelEnricherWithDependency>();
+			});
+
+			var provider = services.BuildServiceProvider();
+			var client = provider.GetRequiredService<ICommunicationsClient>();
+
+			await client.DispatchAsync(
+				"testPipeline",
+				new[] { CreateIdentityProfile() },
+				TransactionModel.Create(new { }),
+				Array.Empty<string>());
+
+			Assert.AreSame(dependencyInstance, ContentModelEnricherWithDependency.CapturedDependency);
+		}
+
+		[TestMethod]
 		public async Task ShouldFailDispatchWhenProfileEnricherIsNotRegisteredInDI()
 		{
 			var services = new ServiceCollection();
@@ -234,8 +263,31 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 				TransactionModel.Create(new { }),
 				Array.Empty<string>());
 
-			Assert.AreEqual(1, result.Results.Count);
+			Assert.HasCount(1, result.Results);
 			Assert.IsTrue(result.Results.Single().Status.IsFailure());
+		}
+
+		[TestMethod]
+		public async Task ShouldFailDispatchWhenContentModelEnricherIsNotRegisteredInDI()
+		{
+			var services = new ServiceCollection();
+			services.AddTransient<SimpleDependency>();
+
+			services.AddTransmitly(tly =>
+			{
+				ConfigureBasicPipeline(tly);
+				tly.AddContentModelEnricher<ContentModelEnricherWithDependency>();
+			});
+
+			var provider = services.BuildServiceProvider();
+			var client = provider.GetRequiredService<ICommunicationsClient>();
+
+			await Assert.ThrowsExactlyAsync<CommunicationsException>(() =>
+				client.DispatchAsync(
+					"testPipeline",
+					new[] { CreateIdentityProfile() },
+					TransactionModel.Create(new { }),
+					Array.Empty<string>()));
 		}
 
 		[TestMethod]
@@ -260,8 +312,32 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 				TransactionModel.Create(new { }),
 				Array.Empty<string>());
 
-			Assert.AreEqual(1, result.Results.Count);
+			Assert.HasCount(1, result.Results);
 			Assert.IsTrue(result.Results.Single().Status.IsFailure());
+		}
+
+		[TestMethod]
+		public async Task ShouldFailDispatchWhenContentModelEnricherThrows()
+		{
+			var services = new ServiceCollection();
+			services.AddTransient<SimpleDependency>();
+			services.AddTransient<ThrowingContentModelEnricher>();
+
+			services.AddTransmitly(tly =>
+			{
+				ConfigureBasicPipeline(tly);
+				tly.AddContentModelEnricher<ThrowingContentModelEnricher>();
+			});
+
+			var provider = services.BuildServiceProvider();
+			var client = provider.GetRequiredService<ICommunicationsClient>();
+
+			await Assert.ThrowsExactlyAsync<InvalidOperationException>(() =>
+				client.DispatchAsync(
+					"testPipeline",
+					new[] { CreateIdentityProfile() },
+					TransactionModel.Create(new { }),
+					Array.Empty<string>()));
 		}
 
 		[TestMethod]
@@ -294,7 +370,7 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 				Array.Empty<string>());
 
 			var execution = tracker.ExecutionOrder;
-			Assert.AreEqual(2, execution.Count);
+			Assert.HasCount(2, execution);
 			Assert.IsTrue(execution.Contains("global"));
 			Assert.IsTrue(execution.Contains("member"));
 		}
