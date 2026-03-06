@@ -1,4 +1,4 @@
-﻿// ﻿﻿Copyright (c) Code Impressions, LLC. All Rights Reserved.
+﻿// Copyright (c) Code Impressions, LLC. All Rights Reserved.
 //  
 //  Licensed under the Apache License, Version 2.0 (the "License")
 //  you may not use this file except in compliance with the License.
@@ -16,6 +16,13 @@ using Moq;
 using Transmitly;
 using Transmitly.Exceptions;
 using Transmitly.Microsoft.Extensions.DependencyInjection.Tests;
+using Transmitly.ChannelProvider.Configuration;
+using Transmitly.Delivery;
+using Transmitly.Model.Configuration;
+using Transmitly.Persona.Configuration;
+using Transmitly.Pipeline.Configuration;
+using Transmitly.PlatformIdentity.Configuration;
+using Transmitly.Template.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection.Tests
 {
@@ -116,8 +123,8 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 			var provider = services.BuildServiceProvider();
 			var client = provider.GetRequiredService<ICommunicationsClient>();
 
-			await client.DispatchAsync("testPipeline", new List<IPlatformIdentityProfile>(), TransactionModel.Create(new { }), new List<string>());
-			await client.DispatchAsync("testPipeline", new List<IPlatformIdentityProfile>(), TransactionModel.Create(new { }), new List<string>());
+			await client.DispatchAsync("testPipeline", new List<IPlatformIdentityProfile>(), TransactionModel.Create(new { }), new List<string>(), cancellationToken: TestContext.CancellationTokenSource.Token);
+			await client.DispatchAsync("testPipeline", new List<IPlatformIdentityProfile>(), TransactionModel.Create(new { }), new List<string>(), cancellationToken: TestContext.CancellationTokenSource.Token);
 
 			configuratorMock.Verify(x => x.ConfigureClient(It.IsAny<CommunicationsClientBuilder>()), Times.Once);
 		}
@@ -142,8 +149,8 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 			var provider = services.BuildServiceProvider();
 			var client = provider.GetRequiredService<ICommunicationsClient>();
 
-			await client.DispatchAsync("testPipeline", new List<IPlatformIdentityProfile>(), TransactionModel.Create(new { }), new List<string>());
-			await client.DispatchAsync("testPipeline", new List<IPlatformIdentityProfile>(), TransactionModel.Create(new { }), new List<string>());
+			await client.DispatchAsync("testPipeline", new List<IPlatformIdentityProfile>(), TransactionModel.Create(new { }), new List<string>(), cancellationToken: TestContext.CancellationTokenSource.Token);
+			await client.DispatchAsync("testPipeline", new List<IPlatformIdentityProfile>(), TransactionModel.Create(new { }), new List<string>(), cancellationToken: TestContext.CancellationTokenSource.Token);
 
 			configuratorMock.Verify(x => x.ConfigureClient(It.IsAny<CommunicationsClientBuilder>()), Times.Once);
 		}
@@ -175,7 +182,7 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 
 			await client.DispatchAsync("testPipeline",
 				new[] { new TestIdentityReference { Id = "test-id", Type = "test-type" } },
-				TransactionModel.Create(new { }), Array.Empty<string>());
+				TransactionModel.Create(new { }), Array.Empty<string>(), cancellationToken: TestContext.CancellationTokenSource.Token);
 
 			Assert.AreSame(dependencyInstance, IdentityResolverWithDependency.CapturedDependency);
 		}
@@ -209,7 +216,7 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 
 			await client.DispatchAsync("testPipeline",
 				new[] { new TestIdentityReference { Id = "test-id", Type = "test-type" } },
-				TransactionModel.Create(new { }), Array.Empty<string>());
+				TransactionModel.Create(new { }), Array.Empty<string>(), cancellationToken: TestContext.CancellationTokenSource.Token);
 
 			Assert.AreSame(dependencyInstance, ProfileEnricherWithDependency.CapturedDependency);
 		}
@@ -237,7 +244,7 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 				"testPipeline",
 				new[] { CreateIdentityProfile() },
 				TransactionModel.Create(new { }),
-				Array.Empty<string>());
+				Array.Empty<string>(), cancellationToken: TestContext.CancellationTokenSource.Token);
 
 			Assert.AreSame(dependencyInstance, ContentModelEnricherWithDependency.CapturedDependency);
 		}
@@ -261,10 +268,12 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 				"testPipeline",
 				new[] { CreateIdentityProfile() },
 				TransactionModel.Create(new { }),
-				Array.Empty<string>());
+				Array.Empty<string>(), cancellationToken: TestContext.CancellationTokenSource.Token);
 
 			Assert.HasCount(1, result.Results);
-			Assert.IsTrue(result.Results.Single().Status.IsFailure());
+			var dispatchResult = result.Results.Single();
+			Assert.IsNotNull(dispatchResult);
+			Assert.IsTrue(dispatchResult.Status.IsFailure());
 		}
 
 		[TestMethod]
@@ -287,7 +296,7 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 					"testPipeline",
 					new[] { CreateIdentityProfile() },
 					TransactionModel.Create(new { }),
-					Array.Empty<string>()));
+					Array.Empty<string>(), cancellationToken: TestContext.CancellationTokenSource.Token));
 		}
 
 		[TestMethod]
@@ -310,10 +319,12 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 				"testPipeline",
 				new[] { CreateIdentityProfile() },
 				TransactionModel.Create(new { }),
-				Array.Empty<string>());
+				Array.Empty<string>(), cancellationToken: TestContext.CancellationTokenSource.Token);
 
 			Assert.HasCount(1, result.Results);
-			Assert.IsTrue(result.Results.Single().Status.IsFailure());
+			var dispatchResult = result.Results.Single();
+			Assert.IsNotNull(dispatchResult);
+			Assert.IsTrue(dispatchResult.Status.IsFailure());
 		}
 
 		[TestMethod]
@@ -337,7 +348,7 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 					"testPipeline",
 					new[] { CreateIdentityProfile() },
 					TransactionModel.Create(new { }),
-					Array.Empty<string>()));
+					Array.Empty<string>(), cancellationToken: TestContext.CancellationTokenSource.Token));
 		}
 
 		[TestMethod]
@@ -367,7 +378,7 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 				"testPipeline",
 				new[] { CreateIdentityProfile(type: "member-type") },
 				TransactionModel.Create(new { }),
-				Array.Empty<string>());
+				Array.Empty<string>(), cancellationToken: TestContext.CancellationTokenSource.Token);
 
 			var execution = tracker.ExecutionOrder;
 			Assert.HasCount(2, execution);
@@ -402,7 +413,7 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 				"testPipeline",
 				new[] { CreateIdentityProfile() },
 				TransactionModel.Create(new { }),
-				Array.Empty<string>());
+				Array.Empty<string>(), cancellationToken: TestContext.CancellationTokenSource.Token);
 
 			CollectionAssert.AreEqual(
 				new[] { "first", "second", "third" },
@@ -437,7 +448,7 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 					CreateIdentityProfile(id: "3")
 				},
 				TransactionModel.Create(new { }),
-				Array.Empty<string>());
+				Array.Empty<string>(), cancellationToken: TestContext.CancellationTokenSource.Token);
 
 			Assert.AreEqual(3, tracker.InvocationCount);
 		}
@@ -467,9 +478,132 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 				"testPipeline",
 				new[] { new TestIdentityReference { Id = "resolved-user", Type = "member-type" } },
 				TransactionModel.Create(new { }),
-				Array.Empty<string>());
+				Array.Empty<string>(), cancellationToken: TestContext.CancellationTokenSource.Token);
 
 			Assert.AreEqual(1, tracker.InvocationCount);
+		}
+
+		[TestMethod]
+		public void ShouldRegisterCoreFactoriesAndServicesWhenUsingInlineConfiguration()
+		{
+			var services = new ServiceCollection();
+			services.AddTransient<SimpleDependency>();
+			services.AddTransient<TestChannelProviderDispatcher2>();
+
+			services.AddTransmitly(tly =>
+			{
+				ConfigureBasicPipeline(tly);
+			});
+
+			var provider = services.BuildServiceProvider();
+
+			Assert.IsNotNull(provider.GetRequiredService<ICommunicationsClient>());
+			Assert.IsNotNull(provider.GetRequiredService<IDispatchCoordinatorService>());
+			Assert.IsNotNull(provider.GetRequiredService<IDeliveryReportService>());
+			Assert.IsNotNull(provider.GetRequiredService<ITemplateEngineFactory>());
+			Assert.IsNotNull(provider.GetRequiredService<IPipelineFactory>());
+			Assert.IsNotNull(provider.GetRequiredService<IPipelineService>());
+			Assert.IsNotNull(provider.GetRequiredService<IChannelProviderFactory>());
+			Assert.IsNotNull(provider.GetRequiredService<IChannelChannelProviderService>());
+			Assert.IsNotNull(provider.GetRequiredService<IPersonaFactory>());
+			Assert.IsNotNull(provider.GetRequiredService<IPersonaService>());
+			Assert.IsNotNull(provider.GetRequiredService<IPlatformIdentityResolverFactory>());
+			Assert.IsNotNull(provider.GetRequiredService<IPlatformIdentityService>());
+			Assert.IsNotNull(provider.GetRequiredService<IContentModelEnricherFactory>());
+			Assert.IsNotNull(provider.GetRequiredService<IContentModelEnricherService>());
+			Assert.IsNotNull(provider.GetRequiredService<IPlatformIdentityProfileEnricherFactory>());
+			Assert.IsNotNull(provider.GetRequiredService<IPlatformIdentityProfileEnricherService>());
+		}
+
+		[TestMethod]
+		public async Task ShouldUseDIForDeliveryReportRequestAdaptor()
+		{
+			var services = new ServiceCollection();
+			var dependencyInstance = new SimpleDependency();
+			TestDeliveryReportRequestAdaptor.CapturedDependency = null;
+
+			services.AddSingleton(dependencyInstance);
+			services.AddTransient<TestChannelProviderDispatcher2>();
+			services.AddTransient<TestDeliveryReportRequestAdaptor>();
+
+			services.AddTransmitly(tly =>
+			{
+				var providerBuilder = tly.ChannelProvider.Build("Test Channel");
+				providerBuilder.AddDispatcher<TestChannelProviderDispatcher2, object>();
+				providerBuilder.AddDeliveryReportRequestAdaptor<TestDeliveryReportRequestAdaptor>();
+				providerBuilder.Register();
+
+				tly.Pipeline.Add("testPipeline", pipeline =>
+					pipeline.AddEmail("test@test.com", email =>
+					{
+						email.Subject.AddStringTemplate("test-subject");
+						email.TextBody.AddStringTemplate("test-body");
+					}));
+			});
+
+			var provider = services.BuildServiceProvider();
+			var channelProviderFactory = provider.GetRequiredService<IChannelProviderFactory>();
+			var adaptorRegistrations = await channelProviderFactory.GetAllDeliveryReportRequestAdaptorsAsync();
+			Assert.HasCount(1, adaptorRegistrations);
+
+			var resolvedAdaptor = await channelProviderFactory.ResolveDeliveryReportRequestAdaptorAsync(adaptorRegistrations.Single());
+			Assert.IsNotNull(resolvedAdaptor);
+			Assert.AreSame(dependencyInstance, TestDeliveryReportRequestAdaptor.CapturedDependency);
+		}
+
+		[TestMethod]
+		public async Task ShouldRegisterConfiguredPersonasInPersonaFactory()
+		{
+			var services = new ServiceCollection();
+			services.AddTransient<SimpleDependency>();
+			services.AddTransient<TestChannelProviderDispatcher2>();
+
+			services.AddTransmitly(tly =>
+			{
+				ConfigureBasicPipeline(tly);
+				tly.AddPersona<TestPersona>("vip", "member-type", persona => persona.IsVip);
+			});
+
+			var provider = services.BuildServiceProvider();
+			var personaFactory = provider.GetRequiredService<IPersonaFactory>();
+			var registeredPersonas = await personaFactory.GetAllAsync();
+
+			Assert.IsTrue(registeredPersonas.Any(p => p.Name == "vip" && p.PlatformIdentityType == "member-type"));
+			Assert.IsTrue(await personaFactory.AnyMatch("vip", new[] { new TestPersona { IsVip = true } }));
+			Assert.IsFalse(await personaFactory.AnyMatch("vip", new[] { new TestPersona { IsVip = false } }));
+		}
+
+		[TestMethod]
+		public async Task ShouldDispatchDeliveryReportsToRegisteredObservers()
+		{
+			var services = new ServiceCollection();
+			TrackingDeliveryReportObserver.Reset();
+			var observer = new TrackingDeliveryReportObserver();
+
+			services.AddTransmitly(tly => tly.AddDeliveryReportHandler(observer));
+
+			var provider = services.BuildServiceProvider();
+			var client = provider.GetRequiredService<ICommunicationsClient>();
+			var report = new DeliveryReport(
+				DeliveryReport.Event.Dispatched(),
+				Id.Channel.Email(),
+				"provider-id",
+				"pipeline-intent",
+				"pipeline-id",
+				"resource-id",
+				CommunicationsStatus.Success("test-status", "ok"),
+				null,
+				null,
+				null);
+
+			await client.DispatchAsync(report);
+			for (var i = 0; i < 20 && TrackingDeliveryReportObserver.OnNextCount == 0; i++)
+			{
+				await Task.Delay(25, TestContext.CancellationTokenSource.Token);
+			}
+
+			Assert.AreEqual(1, TrackingDeliveryReportObserver.OnNextCount);
+			Assert.AreEqual(report, TrackingDeliveryReportObserver.LastReport);
 		}
 
 		private static PlatformIdentityProfile CreateIdentityProfile(string id = "test-id", string type = "test-type")
@@ -487,5 +621,7 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 					   email.TextBody.AddStringTemplate("test-body");
 				   }));
 		}
+
+		public TestContext TestContext { get; set; }
 	}
 }

@@ -12,24 +12,22 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using Transmitly.PlatformIdentity.Configuration;
-using Transmitly.Microsoft.Extensions.DependencyInjection.Tests;
-using Transmitly;
+using Transmitly.Delivery;
 
-namespace Microsoft.Extensions.DependencyInjection.Tests
+namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
 {
-	public partial class TransmitlyDependencyInjectionExtensionsTests
+	class TestDeliveryReportRequestAdaptor : IChannelProviderDeliveryReportRequestAdaptor
 	{
-		class ProfileEnricherWithDependency(SimpleDependency dependency) : IPlatformIdentityProfileEnricher
-		{
-			public static SimpleDependency? CapturedDependency { get; set; }
-			private readonly SimpleDependency _dependency = dependency;
+		public static SimpleDependency? CapturedDependency { get; set; }
 
-			public Task EnrichIdentityProfileAsync(IPlatformIdentityProfile identityProfile)
-			{
-				CapturedDependency = _dependency;
-				return Task.CompletedTask;
-			}
+		public TestDeliveryReportRequestAdaptor(SimpleDependency dependency)
+		{
+			CapturedDependency = dependency ?? throw new ArgumentNullException(nameof(dependency));
+		}
+
+		public Task<IReadOnlyCollection<DeliveryReport>?> AdaptAsync(IRequestAdaptorContext adaptorContext)
+		{
+			return Task.FromResult<IReadOnlyCollection<DeliveryReport>?>(Array.Empty<DeliveryReport>());
 		}
 	}
 }

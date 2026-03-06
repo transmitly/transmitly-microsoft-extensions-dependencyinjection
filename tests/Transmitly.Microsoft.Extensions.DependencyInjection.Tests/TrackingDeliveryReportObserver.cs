@@ -1,4 +1,4 @@
-﻿// Copyright (c) Code Impressions, LLC. All Rights Reserved.
+// Copyright (c) Code Impressions, LLC. All Rights Reserved.
 //  
 //  Licensed under the Apache License, Version 2.0 (the "License")
 //  you may not use this file except in compliance with the License.
@@ -12,15 +12,33 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Transmitly.Delivery;
+
 namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
 {
-	public class TestIdentityReference : IPlatformIdentityReference
+	class TrackingDeliveryReportObserver : IObserver<DeliveryReport>
 	{
-		public string? Id { get; set; }
+		public static int OnNextCount { get; private set; }
+		public static DeliveryReport? LastReport { get; private set; }
 
-		public string? Type { get; set; }
-		string IPlatformIdentityReference.Id => Id!;
+		public static void Reset()
+		{
+			OnNextCount = 0;
+			LastReport = null;
+		}
 
-		string IPlatformIdentityReference.Type => Type!;
+		public void OnCompleted()
+		{
+		}
+
+		public void OnError(Exception error)
+		{
+		}
+
+		public void OnNext(DeliveryReport value)
+		{
+			OnNextCount++;
+			LastReport = value;
+		}
 	}
 }

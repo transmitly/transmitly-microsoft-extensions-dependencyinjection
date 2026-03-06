@@ -1,4 +1,4 @@
-﻿// ﻿﻿Copyright (c) Code Impressions, LLC. All Rights Reserved.
+﻿// Copyright (c) Code Impressions, LLC. All Rights Reserved.
 //  
 //  Licensed under the Apache License, Version 2.0 (the "License")
 //  you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
 			var provider = services.BuildServiceProvider();
 			var client = provider.GetService<ICommunicationsClient>();
 			Assert.IsNotNull(client);
-			var result = await client.DispatchAsync("test-pipeline", "test@test.com", new { });
+			var result = await client.DispatchAsync("test-pipeline", "test@test.com", new { }, cancellationToken: TestContext.CancellationTokenSource.Token);
 			Assert.HasCount(1, result.Results);
 			Assert.AreEqual(Id.Channel.Email(), result.Results.FirstOrDefault()?.ChannelId);
 			Assert.AreEqual("test-channel-provider", result.Results.FirstOrDefault()?.ChannelProviderId);
@@ -72,7 +72,7 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
 			var provider = services.BuildServiceProvider();
 			var client = provider.GetService<ICommunicationsClient>();
 			Assert.IsNotNull(client);
-			var result = await client.DispatchAsync("test-pipeline", "test@test.com", new { });
+			var result = await client.DispatchAsync("test-pipeline", "test@test.com", new { }, cancellationToken: TestContext.CancellationTokenSource.Token);
 			Assert.HasCount(2, result.Results);
 			var results = result.Results.ToList();
 			Assert.AreEqual("Object2", results[0]?.ResourceId);
@@ -101,10 +101,12 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
 			var provider = services.BuildServiceProvider();
 			var client = provider.GetService<ICommunicationsClient>();
 			Assert.IsNotNull(client);
-			var result = await client.DispatchAsync("test-pipeline", new List<TestIdentityReference> { new() { Id = "Test", Type = "" } }, TransactionModel.Create(new { }));
+			var result = await client.DispatchAsync("test-pipeline", new List<TestIdentityReference> { new() { Id = "Test", Type = "" } }, TransactionModel.Create(new { }), cancellationToken: TestContext.CancellationTokenSource.Token);
 			Assert.HasCount(1, result.Results);
 			Assert.AreEqual(Id.Channel.Email(), result.Results.FirstOrDefault()?.ChannelId);
 			Assert.AreEqual("test-channel-provider", result.Results.FirstOrDefault()?.ChannelProviderId);
 		}
+
+		public TestContext TestContext { get; set; }
 	}
 }

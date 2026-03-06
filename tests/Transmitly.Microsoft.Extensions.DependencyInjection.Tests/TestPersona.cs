@@ -1,4 +1,4 @@
-﻿// Copyright (c) Code Impressions, LLC. All Rights Reserved.
+// Copyright (c) Code Impressions, LLC. All Rights Reserved.
 //  
 //  Licensed under the Apache License, Version 2.0 (the "License")
 //  you may not use this file except in compliance with the License.
@@ -12,15 +12,10 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using Transmitly;
-
-namespace Microsoft.Extensions.DependencyInjection.Tests
+namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
 {
-	class MockClientConfigurator(ConfigureClientTracker tracker) : ICommunicationsClientConfigurator
+	class TestPersona
 	{
-		public void ConfigureClient(CommunicationsClientBuilder builder)
-		{
-			tracker.WasCalled = true;
-		}
+		public bool IsVip { get; set; }
 	}
 }

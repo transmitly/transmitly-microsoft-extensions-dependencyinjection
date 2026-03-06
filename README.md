@@ -1,187 +1,103 @@
-# Transmitly.Microsoft.Extensions.Dependencyinjection
+# Transmitly.Microsoft.Extensions.DependencyInjection
 
-A [Transmitly](https://github.com/transmitly/transmitly) extension to help with configuring a communications client using Microsoft Dependency Injection.
+Microsoft DI integration for [Transmitly](https://github.com/transmitly/transmitly).
 
-### Getting started
+This package wraps Transmitly registration so `ICommunicationsClient` and core Transmitly factories are wired through `IServiceCollection`, allowing constructor injection in your Transmitly components.
 
-To use the dependency injection extension, first install the [NuGet package](https://nuget.org/packages/transmitly.microsoft.extensions.dependencyinjection):
+## What this package adds
+
+- Registers `ICommunicationsClient` so it can be resolved from Microsoft DI.
+- Bridges Transmitly factories to `IServiceProvider`, including channel provider dispatcher resolution and:
+  - platform identity resolvers
+  - content model enrichers
+  - platform identity profile enrichers
+- Supports class-based configuration via `ICommunicationsClientConfigurator`.
+- Supports swapping in a custom `ICommunicationsClient` implementation.
+
+## Install
 
 ```shell
-dotnet add package Transmitly.Microsoft.Extensions.Dependencyinjection
+dotnet add package Transmitly.Microsoft.Extensions.DependencyInjection
 ```
 
-Then start configuring...
+## Quick Start
+
+Use inline builder configuration:
 
 ```csharp
 using Transmitly;
-...
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddTransmitly(tly=>{
-	//Check out the Transmit.ly project for details on configuration options!
+
+builder.Services.AddTransmitly(tly =>
+{
+    // Configure channels, pipelines, templates, resolvers, enrichers, etc.
 });
 
+var app = builder.Build();
+
+// Anywhere in your app:
+var client = app.Services.GetRequiredService<ICommunicationsClient>();
 ```
-* Check out the [Transmitly](https://github.com/transmitly/transmitly) project for more details on how to configure a communications client as well as how it can be used to improve how you manage your customer communications.
 
-### Advanced Configuration
-If you need to access a database or service or just in general need to access services via dependency injection consdering registring an `ICommunicationsClientConfigurator` object to give yourself more control. 
+## DI-Backed Components
 
-First we'll create implement the `ICommunicationsClientConfigurator`
-
-MyPlatformCommsConfig.cs
+If a resolver/enricher has constructor dependencies, register the type in DI first.
 
 ```csharp
-public class MyPlatformCommsConfig : ICommunicationsClientConfigurator
-{
-    private readonly IOptions<TransmitlySettings> _options;
-    private readonly ICommunicationsPipelineConfigurator[] _pipelineConfigurators;
+builder.Services.AddSingleton<IMyDependency, MyDependency>();
+builder.Services.AddTransient<MyIdentityResolver>();
+builder.Services.AddTransient<MyContentModelEnricher>();
+builder.Services.AddTransient<MyProfileEnricher>();
 
-    // ICommunicationsPipelineConfigurator would be a custom inteface and you would be responsible for registering these implementations.
-    public MyPlatformCommsConfig(IOptions<TransmitlySettings> options, IEnumerable<ICommunicationsPipelineConfigurator> pipelineConfigurators) 
+builder.Services.AddTransmitly(tly =>
+{
+    tly.AddPlatformIdentityResolver<MyIdentityResolver>();
+    tly.AddContentModelEnricher<MyContentModelEnricher>();
+    tly.AddPlatformIdentityProfileEnricher<MyProfileEnricher>();
+});
+```
+
+If these types are added to the Transmitly builder but not registered in DI, they may fail to resolve at dispatch time.
+
+## Class-Based Configuration
+
+If you want the Transmitly setup itself to use DI dependencies, implement `ICommunicationsClientConfigurator`.
+
+```csharp
+public sealed class MyTransmitlyConfigurator : ICommunicationsClientConfigurator
+{
+    private readonly IOptions<MyTransmitlyOptions> _options;
+
+    public MyTransmitlyConfigurator(IOptions<MyTransmitlyOptions> options)
     {
         _options = options;
-        _pipelineConfigurators = [.. pipelineConfigurators];
     }
 
-    public void ConfigureClient(CommunicationsClientBuilder cfg)
+    public void ConfigureClient(CommunicationsClientBuilder builder)
     {
-        var transmitlySettings = _options.Value;
-
-        cfg
-        .AddTwilioSupport(twilio =>
-        {
-            var twilioConfig = transmitlySettings.ChannelProviders.Twilio;
-
-            twilio.AuthToken = twilioConfig.AuthToken;
-            twilio.AccountSid = twilioConfig.AccountSid;
-        })
-        .AddSmtpSupport(smtp =>
-        {
-            var smtpConfig = transmitlySettings.ChannelProviders.Smtp;
-
-            smtp.Host = smtpConfig.Host;
-            smtp.Port = smtpConfig.Port;
-            smtp.UserName = smtpConfig.UserName;
-            smtp.Password = smtpConfig.Password;
-        });
+        // Build Transmitly config using _options and other injected services.
     }
-
-    private void ConfigurePipelines(CommunicationsClientBuilder cfg)
-    {
-        foreach (var communicationsPipelineConfigurator in _pipelineConfigurators)
-        {
-            cfg.AddPipeline(communicationsPipelineConfigurator.Name, cfg =>
-            {
-                communicationsPipelineConfigurator.Configure(cfg);
-            });
-        }
-    }
-
 }
 ```
-If you're familiiar with Transmitly, it's doing all the same things you're familiar with. The difference is you can now use registered classes and interfaces from your app's registration. This exmpale allows you to pull your config from jsut about anywhere. It also allows you to define custom pipeline configurators. These would allow you to spread your pipline configuration by domain, service, team or just about any way that makes sense for your team.
 
-Example Pipline Configurator
-
-```csharp
-public class MyOrderPlacePipeline : ICommunicationsPipelineConfigurator
-{
-  public string Name => "ordering.placement.thankyou";
-
-  public void Configure(IPipelineConfiguration pipeline)
-  {
-    pipeline
-      .AddEmail("from@example.com".AsIdentityAddress(), email =>
-      {
-        email.Subject.AddStringTemplate("Transmit.ly order receipt: {{OrderId}}");
-        email.HtmlBody.AddStringTemplate("<h1>Thank you for your order {{aud.FirstName}}</h1><p>Totaling ${{GrandTotal}}.  Your order id is {{OrderId}}.</p>");
-        email.TextBody.AddStringTemplate("Thank you for your order {{aud.FirstName}}, totaling ${{GrandTotal}} dollars.  Your order id is {{OrderId}}.");
-      })
-      .AddVoice("18881234567".AsIdentityAddress(), sms =>
-      {
-        sms.Message.AddStringTemplate("Thank you for your order {{aud.FirstName}}, totaling {{GrandTotal}} dollars.  Your order id is {{OrderId}}");
-      });
-  }
-}
-
-```
-
-Next, we'll need to let Transmitly know you're taking going to take control over the configuration in our `MyPlatformCommsConfig` class
-
-Program.cs
-```csharp
-using Transmitly;
-...
-
-var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddTransmitly<MyPlatformCommsConfig>();
-```
-Yup, it's that simple. Now when you resolve an `ICommunicationsClient` your custom `MyPlatformCommsConfig` will be called.
-
-
-
-### Still need more control?
-If implementing your own `ICommunicationsClientConfigurator` isn't enough control. Consider also registering your own custom `ICommunciationsClient` implementations
-
-MyCustomClient
-```csharp
-public class InjectedConfiguredCommunicationsClient : ICommunicationsClient
-{
-  private readonly Lazy<ICommunicationsClient> _lazy;
-
-  public InjectedConfiguredCommunicationsClient(ICommunicationsClientConfigurator configurator)
-  {
-    _lazy = new Lazy<ICommunicationsClient>(() =>
-    {
-      var cfg = new CommunicationsClientBuilder();
-      configurator.ConfigureClient(cfg);
-      return cfg.BuildClient();
-    });
-  }
-
-  public ICommunicationsClient Client
-  {
-    get
-    {
-      return _lazy.Value;
-    }
-  }
-
-  public void DeliverReport(DeliveryReport report)
-  {
-    Client.DeliverReport(report);
-  }
-
-  public void DeliverReports(IReadOnlyCollection<DeliveryReport> reports)
-  {
-    Client.DeliverReports(reports);
-  }
-
-  public Task<IDispatchCommunicationResult> DispatchAsync(string pipelineName, IReadOnlyCollection<IPlatformIdentityProfile> platformIdentities, ITransactionModel transactionalModel, IReadOnlyCollection<string> channelPreferences, string? cultureInfo = null, CancellationToken cancellationToken = default)
-  {
-    return Client.DispatchAsync(pipelineName, platformIdentities, transactionalModel, channelPreferences, cultureInfo, cancellationToken);
-  }
-
-  public Task<IDispatchCommunicationResult> DispatchAsync(string pipelineName, IReadOnlyCollection<IPlatformIdentityReference> identityReferences, ITransactionModel transactionalModel, IReadOnlyCollection<string> channelPreferences, string? cultureInfo = null, CancellationToken cancellationToken = default)
-  {
-    return Client.DispatchAsync(pipelineName, identityReferences, transactionalModel, channelPreferences, cultureInfo, cancellationToken);
-  }
-```
-
-
-Registration example
+Register it:
 
 ```csharp
-using Transmitly;
-...
-
-var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddTransmitly<MyPlatformCommsConfig, InjectedConfiguredCommunicationsClient>();
+builder.Services.AddTransmitly<MyTransmitlyConfigurator>();
 ```
 
-Registering your own communications client gives you the ultimate flexibility and control over configuration, and execution of your notifications.
+## Custom Client Override
+
+To provide your own `ICommunicationsClient` implementation:
+
+```csharp
+builder.Services.AddTransmitly<MyTransmitlyConfigurator, MyCommunicationsClient>();
+```
+
+## More Transmitly Docs
+
+For full channel/pipeline/template configuration options, see the main [Transmitly project](https://github.com/transmitly/transmitly).
 
 ---
-_Copyright © Code Impressions, LLC.  This open-source project is sponsored and maintained by Code Impressions
-and is licensed under the [Apache License, Version 2.0](http://apache.org/licenses/LICENSE-2.0.html)._
+_Copyright (c) Code Impressions, LLC. This open-source project is sponsored and maintained by Code Impressions and is licensed under the [Apache License, Version 2.0](http://apache.org/licenses/LICENSE-2.0.html)._
