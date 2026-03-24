@@ -110,9 +110,14 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
 				_services.AddSingleton<DefaultCommunicationsClient>();
 			else
 			{
-				//middleware before us has created a client, register it's type instead
+				// Rebuild the default client via DI so service-provider-backed factories are used.
+				// Custom wrapper clients may depend on runtime-only constructor arguments, so keep
+				// those as the already-created instance instead of asking DI to construct them.
 				previousClientType = previous.GetType();
-				_services.AddSingleton(previousClientType);
+				if (previousClientType == typeof(DefaultCommunicationsClient))
+					_services.AddSingleton(previousClientType);
+				else
+					_services.AddSingleton(previousClientType, previous);
 				
 			}
 
