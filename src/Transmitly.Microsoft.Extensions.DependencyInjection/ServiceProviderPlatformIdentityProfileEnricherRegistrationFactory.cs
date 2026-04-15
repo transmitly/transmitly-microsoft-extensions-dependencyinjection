@@ -22,7 +22,8 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
 {
 	sealed class ServiceProviderPlatformIdentityProfileEnricherRegistrationFactory(
 		IEnumerable<IPlatformIdentityProfileEnricherRegistration> enricherRegistrations,
-		IServiceProvider serviceProvider) : BasePlatformIdentityProfileEnricherRegistrationFactory(enricherRegistrations)
+		IServiceProvider serviceProvider,
+		ILoggerFactory loggerFactory) : BasePlatformIdentityProfileEnricherRegistrationFactory(enricherRegistrations, loggerFactory)
 	{
 		public override Task<IPlatformIdentityProfileEnricher?> GetPlatformIdentityProfileEnricher(IPlatformIdentityProfileEnricherRegistration platformIdentityProfileEnricherRegistration)
 		{

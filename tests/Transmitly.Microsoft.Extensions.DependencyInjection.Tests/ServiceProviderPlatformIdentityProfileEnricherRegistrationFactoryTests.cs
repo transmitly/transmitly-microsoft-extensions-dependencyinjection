@@ -13,6 +13,7 @@
 //  limitations under the License.
 
 using Moq;
+using Transmitly.Logging;
 using Transmitly.PlatformIdentity.Configuration;
 
 namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
@@ -33,7 +34,8 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
 
 			var factory = new ServiceProviderPlatformIdentityProfileEnricherRegistrationFactory(
 				new[] { registrationMock.Object },
-				serviceProviderMock.Object
+				serviceProviderMock.Object,
+				new TestLoggerFactory()
 			);
 
 			var result = await factory.GetPlatformIdentityProfileEnricher(registrationMock.Object);
@@ -48,10 +50,23 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
 			var serviceProviderMock = new Mock<IServiceProvider>();
 			var factory = new ServiceProviderPlatformIdentityProfileEnricherRegistrationFactory(
 				Array.Empty<IPlatformIdentityProfileEnricherRegistration>(),
-				serviceProviderMock.Object
+				serviceProviderMock.Object,
+				new TestLoggerFactory()
 			);
 
 			await Assert.ThrowsExactlyAsync<ArgumentNullException>(() => factory.GetPlatformIdentityProfileEnricher(null!));
+		}
+
+		private sealed class TestLoggerFactory : ILoggerFactory
+		{
+			public ILogger CreateLogger(string categoryName) => new TestLogger(categoryName);
+		}
+
+		private sealed class TestLogger(string categoryName) : ILogger
+		{
+			public string CategoryName { get; } = categoryName;
+			public bool IsEnabled(LogLevel level) => false;
+			public void Log(LogEntry entry) { }
 		}
 	}
 }

@@ -13,6 +13,7 @@
 //  limitations under the License.
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Linq;
 using Transmitly.ChannelProvider.Configuration;
@@ -32,6 +33,8 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
 
 		public override ICommunicationsClient CreateClient(ICreateCommunicationsClientContext context, ICommunicationsClient? previous)
 		{
+			_services.TryAddSingleton<ILoggerFactory>(_ => context.LoggerFactory);
+
 			foreach (var pipelineRegistration in context.Pipelines)
 			{
 				_services.AddSingleton(pipelineRegistration);
@@ -121,7 +124,7 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
 				
 			}
 
-			_services.AddSingleton(sp => previousClientType != null ? (ICommunicationsClient)sp.GetRequiredService(previousClientType) : sp.GetRequiredService<DefaultCommunicationsClient>());
+			_services.AddSingleton<ICommunicationsClient>(sp => previousClientType != null ? (ICommunicationsClient)sp.GetRequiredService(previousClientType) : sp.GetRequiredService<DefaultCommunicationsClient>());
 
 			return previous ?? new UseContainerToResolveCommunicationsClient();
 		}

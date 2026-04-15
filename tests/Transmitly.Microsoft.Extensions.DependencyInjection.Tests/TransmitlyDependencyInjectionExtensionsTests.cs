@@ -1,4 +1,4 @@
-﻿// Copyright (c) Code Impressions, LLC. All Rights Reserved.
+// Copyright (c) Code Impressions, LLC. All Rights Reserved.
 //  
 //  Licensed under the Apache License, Version 2.0 (the "License")
 //  you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
 
 using Moq;
 using Transmitly;
+using Transmitly.ChannelProvider;
 using Transmitly.Exceptions;
 using Transmitly.Microsoft.Extensions.DependencyInjection.Tests;
 using Transmitly.ChannelProvider.Configuration;
@@ -23,6 +24,8 @@ using Transmitly.Persona.Configuration;
 using Transmitly.Pipeline.Configuration;
 using Transmitly.PlatformIdentity.Configuration;
 using Transmitly.Template.Configuration;
+using Transmitly.Logging;
+using Transmitly.Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.Extensions.DependencyInjection.Tests
 {
@@ -606,9 +609,129 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 			Assert.AreEqual(report, TrackingDeliveryReportObserver.LastReport);
 		}
 
+		[TestMethod]
+		public async Task ShouldExposeConfiguredTransmitlyLoggerFactoryToDiCreatedDispatchers()
+		{
+			var services = new ServiceCollection();
+			var loggerFactory = new RecordingLoggerFactory();
+			LoggerAwareDispatcher.CapturedLoggerFactory = null;
+
+			services.AddSingleton<ILoggerFactory>(loggerFactory);
+			services.AddTransient<SimpleDependency>();
+			services.AddTransient<LoggerAwareDispatcher>();
+
+			services.AddTransmitly(tly =>
+			{
+				tly.AddLogging()
+					.ChannelProvider.Add<LoggerAwareDispatcher, object>("Test Channel")
+					.AddPipeline("testPipeline", pipeline =>
+						pipeline.AddEmail("test@test.com", email =>
+						{
+							email.Subject.AddStringTemplate("test-subject");
+							email.TextBody.AddStringTemplate("test-body");
+						}));
+			});
+
+			var provider = services.BuildServiceProvider();
+			var client = provider.GetRequiredService<ICommunicationsClient>();
+
+			await client.DispatchAsync(
+				"testPipeline",
+				new[] { CreateIdentityProfile() },
+				TransactionModel.Create(new { }),
+				Array.Empty<string>(),
+				cancellationToken: TestContext.CancellationTokenSource.Token);
+
+			Assert.AreSame(loggerFactory, provider.GetRequiredService<ILoggerFactory>());
+			Assert.AreSame(loggerFactory, LoggerAwareDispatcher.CapturedLoggerFactory);
+		}
+
+		[TestMethod]
+		public async Task ShouldUseDIForConfiguredChannelProviderDispatcher()
+		{
+			var services = new ServiceCollection();
+			var dependencyInstance = new SimpleDependency();
+			var configuration = new DispatcherConfiguration("configured-value");
+			ConfiguredDispatcher.CapturedDependency = null;
+			ConfiguredDispatcher.CapturedConfiguration = null;
+
+			services.AddSingleton(dependencyInstance);
+
+			services.AddTransmitly(tly =>
+			{
+				tly.ChannelProvider.Add<ConfiguredDispatcher, object>("Test Channel", configuration)
+					.AddPipeline("testPipeline", pipeline =>
+						pipeline.AddEmail("test@test.com", email =>
+						{
+							email.Subject.AddStringTemplate("test-subject");
+							email.TextBody.AddStringTemplate("test-body");
+						}));
+			});
+
+			var provider = services.BuildServiceProvider();
+			var client = provider.GetRequiredService<ICommunicationsClient>();
+
+			await client.DispatchAsync(
+				"testPipeline",
+				new[] { CreateIdentityProfile() },
+				TransactionModel.Create(new { }),
+				Array.Empty<string>(),
+				cancellationToken: TestContext.CancellationTokenSource.Token);
+
+			Assert.AreSame(dependencyInstance, ConfiguredDispatcher.CapturedDependency);
+			Assert.AreSame(configuration, ConfiguredDispatcher.CapturedConfiguration);
+		}
+
+		[TestMethod]
+		public void ServiceCollectionFactoryShouldRegisterContextLoggerFactoryWhenNoneExists()
+		{
+			var services = new ServiceCollection();
+			var loggerFactory = new RecordingLoggerFactory();
+			var factory = new ServiceCollectionCommunicationClientFactory(services);
+			var previous = new StubCommunicationsClient();
+
+			factory.CreateClient(CreateContext(loggerFactory), previous);
+
+			var provider = services.BuildServiceProvider();
+
+			Assert.AreSame(loggerFactory, provider.GetRequiredService<ILoggerFactory>());
+		}
+
+		[TestMethod]
+		public void ServiceCollectionFactoryShouldPreserveCustomPreviousClientInstance()
+		{
+			var services = new ServiceCollection();
+			var loggerFactory = new RecordingLoggerFactory();
+			var factory = new ServiceCollectionCommunicationClientFactory(services);
+			var previous = new StubCommunicationsClient();
+
+			var returned = factory.CreateClient(CreateContext(loggerFactory), previous);
+			var provider = services.BuildServiceProvider();
+
+			Assert.AreSame(previous, returned);
+			Assert.AreSame(previous, provider.GetRequiredService<ICommunicationsClient>());
+		}
+
+		[TestMethod]
+		public void ServiceCollectionFactoryShouldReturnContainerPlaceholderWhenThereIsNoPreviousClient()
+		{
+			var services = new ServiceCollection();
+			var loggerFactory = new RecordingLoggerFactory();
+			var factory = new ServiceCollectionCommunicationClientFactory(services);
+
+			var returned = factory.CreateClient(CreateContext(loggerFactory), previous: null);
+
+			Assert.IsInstanceOfType<UseContainerToResolveCommunicationsClient>(returned);
+		}
+
 		private static PlatformIdentityProfile CreateIdentityProfile(string id = "test-id", string type = "test-type")
 		{
 			return new PlatformIdentityProfile(id, type, new[] { "test@test.com".AsIdentityAddress() });
+		}
+
+		private static ICreateCommunicationsClientContext CreateContext(ILoggerFactory loggerFactory)
+		{
+			return new TestCreateCommunicationsClientContext(loggerFactory);
 		}
 
 		private static void ConfigureBasicPipeline(CommunicationsClientBuilder tly)
@@ -620,6 +743,98 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 					   email.Subject.AddStringTemplate("test-subject");
 					   email.TextBody.AddStringTemplate("test-body");
 				   }));
+		}
+
+		private sealed class LoggerAwareDispatcher(SimpleDependency dependency, ILoggerFactory loggerFactory) : IChannelProviderDispatcher<object>
+		{
+			private readonly SimpleDependency _dependency = dependency;
+			public static ILoggerFactory? CapturedLoggerFactory { get; set; }
+
+			public Task<IReadOnlyCollection<IDispatchResult?>> DispatchAsync(object communication, IDispatchCommunicationContext communicationContext, CancellationToken cancellationToken)
+			{
+				if (_dependency == null)
+					throw new ArgumentNullException(nameof(dependency));
+				CapturedLoggerFactory = loggerFactory;
+				return Task.FromResult<IReadOnlyCollection<IDispatchResult?>>([new DispatchResult(CommunicationsStatus.Success("logger-aware", "ok"))]);
+			}
+		}
+
+		private sealed class ConfiguredDispatcher(SimpleDependency dependency, DispatcherConfiguration configuration) : IChannelProviderDispatcher<object>
+		{
+			public static SimpleDependency? CapturedDependency { get; set; }
+			public static DispatcherConfiguration? CapturedConfiguration { get; set; }
+
+			public Task<IReadOnlyCollection<IDispatchResult?>> DispatchAsync(object communication, IDispatchCommunicationContext communicationContext, CancellationToken cancellationToken)
+			{
+				CapturedDependency = dependency;
+				CapturedConfiguration = configuration;
+				return Task.FromResult<IReadOnlyCollection<IDispatchResult?>>([new DispatchResult(CommunicationsStatus.Success("configured-dispatcher", "ok"))]);
+			}
+		}
+
+		private sealed class StubCommunicationsClient : ICommunicationsClient
+		{
+			public Task<IDispatchCommunicationResult> DispatchAsync(string pipelineIntent, IReadOnlyCollection<IPlatformIdentityProfile> platformIdentities, ITransactionModel transactionalModel, IReadOnlyCollection<string> dispatchChannelPreferences, string? pipelineId = null, string? cultureInfo = null, CancellationToken cancellationToken = default)
+			{
+				throw new NotSupportedException();
+			}
+
+			public Task<IDispatchCommunicationResult> DispatchAsync(string pipelineIntent, IReadOnlyCollection<IPlatformIdentityReference> identityReferences, ITransactionModel transactionalModel, IReadOnlyCollection<string> dispatchChannelPreferences, string? pipelineId = null, string? cultureInfo = null, CancellationToken cancellationToken = default)
+			{
+				throw new NotSupportedException();
+			}
+
+			public Task DispatchAsync(DeliveryReport report)
+			{
+				throw new NotSupportedException();
+			}
+
+			public Task DispatchAsync(IReadOnlyCollection<DeliveryReport> reports)
+			{
+				throw new NotSupportedException();
+			}
+		}
+
+		private sealed class DispatcherConfiguration(string value)
+		{
+			public string Value { get; } = value;
+		}
+
+		private sealed class TestCreateCommunicationsClientContext(ILoggerFactory loggerFactory) : ICreateCommunicationsClientContext
+		{
+			public IReadOnlyCollection<IChannelProviderRegistration> ChannelProviders { get; } = [];
+
+			public IReadOnlyCollection<IPipeline> Pipelines { get; } = [];
+
+			public IReadOnlyCollection<ITemplateEngineRegistration> TemplateEngines { get; } = [];
+
+			public IReadOnlyCollection<IObserver<DeliveryReport>> DeliveryReportObservers { get; } = [];
+
+			public IReadOnlyCollection<IPlatformIdentityResolverRegistration> PlatformIdentityResolvers { get; } = [];
+
+			public IReadOnlyCollection<IContentModelEnricherRegistration> ContentModelEnrichers { get; } = [];
+
+			public IReadOnlyCollection<IPlatformIdentityProfileEnricherRegistration> PlatformIdentityProfileEnrichers { get; } = [];
+
+			public IReadOnlyCollection<IPersonaRegistration> Personas { get; } = [];
+
+			public ILoggerFactory LoggerFactory { get; } = loggerFactory;
+		}
+
+		private sealed class RecordingLoggerFactory : ILoggerFactory
+		{
+			public ILogger CreateLogger(string categoryName) => new RecordingLogger(categoryName);
+		}
+
+		private sealed class RecordingLogger(string categoryName) : ILogger
+		{
+			public string CategoryName { get; } = categoryName;
+
+			public bool IsEnabled(LogLevel level) => true;
+
+			public void Log(LogEntry entry)
+			{
+			}
 		}
 
 		public TestContext TestContext { get; set; }

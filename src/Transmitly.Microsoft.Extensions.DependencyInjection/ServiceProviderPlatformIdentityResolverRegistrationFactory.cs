@@ -20,7 +20,7 @@ using Transmitly.Util;
 
 namespace Transmitly.Microsoft.Extensions.DependencyInjection
 {
-	sealed class ServiceProviderPlatformIdentityResolverRegistrationFactory(IEnumerable<IPlatformIdentityResolverRegistration> resolverRegistrations, IServiceProvider serviceProvider) : BasePlatformIdentityResolverRegistrationFactory(resolverRegistrations)
+	sealed class ServiceProviderPlatformIdentityResolverRegistrationFactory(IEnumerable<IPlatformIdentityResolverRegistration> resolverRegistrations, IServiceProvider serviceProvider, ILoggerFactory loggerFactory) : BasePlatformIdentityResolverRegistrationFactory(resolverRegistrations, loggerFactory)
 	{
 		public override Task<IPlatformIdentityResolver?> GetPlatformIdentityResolver(IPlatformIdentityResolverRegistration platformIdentityResolverRegistration)
 		{
