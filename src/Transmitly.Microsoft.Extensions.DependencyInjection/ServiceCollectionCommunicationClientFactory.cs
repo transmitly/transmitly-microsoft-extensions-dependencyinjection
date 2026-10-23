@@ -44,16 +44,10 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
 			{
 				_services.AddSingleton(channelProvider);
 
-				foreach (var dispatcherType in channelProvider.DispatcherRegistrations.Select(s => s.DispatcherType))
+				if (channelProvider.Configuration == null)
 				{
-					if (channelProvider.Configuration == null)
-					{
+					foreach (var dispatcherType in channelProvider.DispatcherRegistrations.Select(s => s.DispatcherType))
 						_services.AddSingleton(dispatcherType);
-					}
-					else
-					{
-						_services.AddSingleton(dispatcherType, provider => ActivatorUtilities.CreateInstance(provider, dispatcherType, channelProvider.Configuration));
-					}
 				}
 
 				foreach (var channelProviderAdaptorRegistration in channelProvider.DeliveryReportRequestAdaptorRegistrations)

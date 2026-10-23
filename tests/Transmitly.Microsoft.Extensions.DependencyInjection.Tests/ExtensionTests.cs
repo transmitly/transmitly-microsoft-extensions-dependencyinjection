@@ -73,10 +73,8 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
 			var client = provider.GetService<ICommunicationsClient>();
 			Assert.IsNotNull(client);
 			var result = await client.DispatchAsync("test-pipeline", "test@test.com", new { }, cancellationToken: TestContext.CancellationTokenSource.Token);
-			Assert.HasCount(2, result.Results);
-			var results = result.Results.ToList();
-			Assert.AreEqual("Object2", results[0]?.ResourceId);
-			Assert.AreEqual("IEmail", results[1]?.ResourceId);
+			Assert.HasCount(1, result.Results);
+			Assert.AreEqual("Object2", result.Results.First()?.ResourceId);
 		}
 
 		[TestMethod]

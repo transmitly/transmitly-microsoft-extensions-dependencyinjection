@@ -24,11 +24,38 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
 {
 	sealed class ServiceProviderChannelProviderFactory(
 		IEnumerable<IChannelProviderRegistration> channelProviders,
-		IServiceProvider serviceProvider) : BaseChannelProviderFactory(channelProviders)
+		IServiceProvider serviceProvider) : BaseChannelProviderFactory(channelProviders), IDisposable
 	{
+		private readonly Dictionary<(IChannelProviderRegistration, Type), IChannelProviderDispatcher> _configuredDispatchers = [];
+
 		public override Task<IChannelProviderDispatcher?> ResolveDispatcherAsync(IChannelProviderRegistration channelProvider, IChannelProviderDispatcherRegistration channelProviderDispatcherRegistration)
 		{
-			return Task.FromResult((IChannelProviderDispatcher?)serviceProvider.GetService(channelProviderDispatcherRegistration.DispatcherType));
+			var dispatcherType = channelProviderDispatcherRegistration.DispatcherType;
+			if (channelProvider.Configuration == null)
+				return Task.FromResult((IChannelProviderDispatcher?)serviceProvider.GetService(dispatcherType));
+
+			// Providers can share a dispatcher type with different configurations (e.g. two Mailgun accounts),
+			// so configured dispatchers are cached per provider instead of being registered in the container by type.
+			lock (_configuredDispatchers)
+			{
+				var key = (channelProvider, dispatcherType);
+				if (!_configuredDispatchers.TryGetValue(key, out var dispatcher))
+				{
+					dispatcher = (IChannelProviderDispatcher)ActivatorUtilities.CreateInstance(serviceProvider, dispatcherType, channelProvider.Configuration);
+					_configuredDispatchers.Add(key, dispatcher);
+				}
+				return Task.FromResult<IChannelProviderDispatcher?>(dispatcher);
+			}
+		}
+
+		public void Dispose()
+		{
+			lock (_configuredDispatchers)
+			{
+				foreach (var dispatcher in _configuredDispatchers.Values)
+					(dispatcher as IDisposable)?.Dispose();
+				_configuredDispatchers.Clear();
+			}
 		}
 
 		public override Task<IChannelProviderDeliveryReportRequestAdaptor> ResolveDeliveryReportRequestAdaptorAsync(IDeliveryReportRequestAdaptorRegistration channelProviderDeliveryReportRequestAdaptor)

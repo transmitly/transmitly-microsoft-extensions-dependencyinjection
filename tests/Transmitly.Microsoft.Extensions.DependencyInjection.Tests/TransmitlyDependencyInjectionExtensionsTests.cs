@@ -759,10 +759,14 @@ namespace Microsoft.Extensions.DependencyInjection.Tests
 			}
 		}
 
-		private sealed class ConfiguredDispatcher(SimpleDependency dependency, DispatcherConfiguration configuration) : IChannelProviderDispatcher<object>
+		private sealed class ConfiguredDispatcher(SimpleDependency dependency, DispatcherConfiguration configuration) : IChannelProviderDispatcher<object>, IDisposable
 		{
 			public static SimpleDependency? CapturedDependency { get; set; }
 			public static DispatcherConfiguration? CapturedConfiguration { get; set; }
+			public DispatcherConfiguration Configuration => configuration;
+			public bool IsDisposed { get; private set; }
+
+			public void Dispose() => IsDisposed = true;
 
 			public Task<IReadOnlyCollection<IDispatchResult?>> DispatchAsync(object communication, IDispatchCommunicationContext communicationContext, CancellationToken cancellationToken)
 			{
