@@ -22,7 +22,7 @@
 		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 		<PackageIcon>icon-dark.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<RepositoryUrl>https://github.com/transmitly/microsoft-extensions-dependencyInjection.git</RepositoryUrl>
+		<RepositoryUrl>https://github.com/transmitly/transmitly-microsoft-extensions-dependencyinjection.git</RepositoryUrl>
 		<PackageTags>dependency injection; microsoft dependency injection; transmitly; communications; email sender; sms sender; push notifications</PackageTags>
 	</PropertyGroup>
 
