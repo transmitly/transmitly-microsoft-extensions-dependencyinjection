@@ -46,7 +46,7 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.201" PrivateAssets="All" />
 		<PackageReference Include="PolySharp" Version="1.15.0" PrivateAssets="All" />
-		<PackageReference Include="Transmitly" Version="0.4.4" />
+		<PackageReference Include="Transmitly" Version="0.4.5" />
 	</ItemGroup>
 	<ItemGroup>
 		<Using Include="Transmitly.Logging" />
