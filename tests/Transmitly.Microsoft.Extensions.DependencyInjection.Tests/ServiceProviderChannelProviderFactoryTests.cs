@@ -81,5 +81,21 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection.Tests
 
 			await Assert.ThrowsExactlyAsync<InvalidOperationException>(() => factory.ResolveDeliveryReportRequestAdaptorAsync(adaptorRegistration.Object));
 		}
+
+		[TestMethod]
+		public async Task ResolveDeliveryReportRequestAdaptorAsync_ShouldPassProviderConfiguration_WhenConfigured()
+		{
+			var configuration = new SimpleDependency();
+			var adaptorRegistration = new Mock<IDeliveryReportRequestAdaptorRegistration>();
+			adaptorRegistration.SetupGet(x => x.Type).Returns(typeof(TestDeliveryReportRequestAdaptor));
+			adaptorRegistration.SetupGet(x => x.Configuration).Returns(configuration);
+
+			var factory = new ServiceProviderChannelProviderFactory([], new Mock<IServiceProvider>().Object);
+
+			var resolved = await factory.ResolveDeliveryReportRequestAdaptorAsync(adaptorRegistration.Object);
+
+			Assert.IsInstanceOfType<TestDeliveryReportRequestAdaptor>(resolved);
+			Assert.AreSame(configuration, TestDeliveryReportRequestAdaptor.CapturedDependency);
+		}
 	}
 }

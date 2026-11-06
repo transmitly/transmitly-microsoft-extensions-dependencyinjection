@@ -53,7 +53,8 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
 				foreach (var channelProviderAdaptorRegistration in channelProvider.DeliveryReportRequestAdaptorRegistrations)
 				{
 					_services.AddSingleton(channelProviderAdaptorRegistration);
-					_services.AddSingleton(channelProviderAdaptorRegistration.Type);
+					if (channelProviderAdaptorRegistration.Configuration == null)
+						_services.AddSingleton(channelProviderAdaptorRegistration.Type);
 				}
 			}
 

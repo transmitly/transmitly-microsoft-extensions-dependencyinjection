@@ -60,7 +60,12 @@ namespace Transmitly.Microsoft.Extensions.DependencyInjection
 
 		public override Task<IChannelProviderDeliveryReportRequestAdaptor> ResolveDeliveryReportRequestAdaptorAsync(IDeliveryReportRequestAdaptorRegistration channelProviderDeliveryReportRequestAdaptor)
 		{
-			return Task.FromResult((IChannelProviderDeliveryReportRequestAdaptor)serviceProvider.GetRequiredService(channelProviderDeliveryReportRequestAdaptor.Type));
+			var registration = channelProviderDeliveryReportRequestAdaptor;
+			var adaptor = registration.Configuration == null
+				? serviceProvider.GetRequiredService(registration.Type)
+				: ActivatorUtilities.CreateInstance(serviceProvider, registration.Type, registration.Configuration);
+			
+			return Task.FromResult((IChannelProviderDeliveryReportRequestAdaptor)adaptor);
 		}
 	}
 }
